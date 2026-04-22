@@ -1,0 +1,4875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novi AI Inspiration Prototype</title>
+  <style>
+    :root {
+      --bg: #0b0d14;
+      --panel: #121521;
+      --panel-soft: rgba(255, 255, 255, 0.08);
+      --line: rgba(255, 255, 255, 0.12);
+      --text: #ffffff;
+      --muted: rgba(255, 255, 255, 0.68);
+      --subtle: rgba(255, 255, 255, 0.45);
+      --primary: #2f6bff;
+      --primary-soft: rgba(47, 107, 255, 0.18);
+      --success: #7ef2df;
+      --danger: #ff6b7d;
+      --phone-w: 390px;
+      --phone-h: 844px;
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 16% 8%, rgba(68, 44, 165, 0.38), transparent 24%),
+        radial-gradient(circle at 84% 12%, rgba(28, 76, 188, 0.34), transparent 26%),
+        linear-gradient(180deg, #090b12 0%, #070910 100%);
+    }
+
+    .workspace {
+      width: 100%;
+      padding: 10px 22px 30px;
+    }
+
+    .root-tabs {
+      position: sticky;
+      top: 10px;
+      z-index: 40;
+      width: min(720px, calc(100vw - 44px));
+      margin: 0 auto 6px;
+      padding: 10px;
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      gap: 10px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+    }
+
+    .root-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .root-tab-btn {
+      flex: 0 0 auto;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+    }
+
+    .root-tab-btn.active {
+      color: #fff;
+      background: rgba(47, 107, 255, 0.18);
+      border-color: rgba(47, 107, 255, 0.4);
+      box-shadow: 0 10px 24px rgba(47, 107, 255, 0.18);
+    }
+
+    .root-tab-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .root-tab-panel {
+      display: none;
+    }
+
+    .root-tab-panel.active {
+      display: block;
+    }
+
+    .data-page {
+      max-width: 1380px;
+      margin: 0 auto;
+    }
+
+    .data-panel {
+      padding: 24px;
+    }
+
+    .data-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .data-header-copy {
+      max-width: 760px;
+    }
+
+    .data-header-copy h1 {
+      margin: 0;
+    }
+
+    .data-table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .data-table-wrap--requirements {
+      overflow: hidden;
+    }
+
+    .data-table {
+      width: 100%;
+      min-width: 1280px;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 13px 14px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .data-table th {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .col-tight {
+      width: 72px;
+      white-space: nowrap;
+      word-break: keep-all;
+    }
+
+    .col-narrow {
+      width: 96px;
+    }
+
+    .col-medium {
+      width: 136px;
+    }
+
+    .col-wide {
+      width: 220px;
+    }
+
+    .col-xl {
+      width: 300px;
+    }
+
+    .col-remark {
+      width: 240px;
+    }
+
+    .data-table--requirements .col-date,
+    .data-table--requirements .col-status,
+    .data-table--requirements .col-owner,
+    .data-table--requirements .col-priority,
+    .data-table--requirements .col-release {
+      white-space: nowrap;
+      word-break: keep-all;
+    }
+
+    .data-table--requirements {
+      min-width: 100%;
+    }
+
+    .data-table--requirements .col-index {
+      width: 58px;
+      white-space: nowrap;
+      word-break: keep-all;
+    }
+
+    .data-table--requirements .col-product {
+      width: 72px;
+    }
+
+    .data-table--requirements .col-title {
+      width: 140px;
+    }
+
+    .data-table--requirements .col-description {
+      width: 220px;
+    }
+
+    .data-table--requirements .col-owner {
+      width: 72px;
+    }
+
+    .data-table--requirements .col-module-name {
+      width: 86px;
+    }
+
+    .data-table--requirements .col-terminal {
+      width: 92px;
+      white-space: nowrap;
+      word-break: keep-all;
+    }
+
+    .data-table--requirements .col-goal {
+      width: 220px;
+    }
+
+    .data-table--requirements .col-priority {
+      width: 58px;
+    }
+
+    .data-table--requirements .col-version {
+      width: 120px;
+    }
+
+    .data-table--tracking .col-id,
+    .data-table--tracking .col-param,
+    .data-table--tracking .col-value {
+      word-break: break-all;
+    }
+
+    .data-table--tracking .col-module {
+      width: 160px;
+    }
+
+    .data-table--tracking .col-event {
+      width: 140px;
+    }
+
+    .data-table--tracking .col-id {
+      width: 200px;
+    }
+
+    .data-table--tracking .col-param {
+      width: 260px;
+    }
+
+    .data-table--tracking .col-value {
+      width: 260px;
+    }
+
+    .data-table--tracking .col-remark {
+      width: 220px;
+    }
+
+    .placeholder-page {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .placeholder-panel {
+      padding: 28px 24px;
+    }
+
+    .placeholder-grid {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .placeholder-card {
+      padding: 18px 18px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+    }
+
+    .placeholder-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .placeholder-card span {
+      display: block;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+
+    .review-page {
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    .review-layout {
+      display: grid;
+      grid-template-columns: minmax(360px, 460px) 390px;
+      justify-content: center;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .review-brief {
+      padding: 24px;
+    }
+
+    .review-brief-grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .review-brief-card {
+      padding: 16px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+    }
+
+    .review-brief-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .review-brief-card span {
+      display: block;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+
+    .review-prototype-wrap {
+      display: flex;
+      justify-content: center;
+      width: 390px;
+    }
+
+    .review-phone-screen {
+      background:
+        radial-gradient(circle at top, rgba(255, 223, 167, 0.18), transparent 24%),
+        linear-gradient(180deg, #17141f 0%, #0d1018 100%);
+    }
+
+    .review-export-stage {
+      position: absolute;
+      inset: 0;
+      padding: 92px 20px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .review-export-card {
+      border-radius: 28px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.24);
+    }
+
+    .review-export-preview {
+      height: 430px;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.26)),
+        radial-gradient(circle at 70% 22%, rgba(255, 216, 171, 0.42), transparent 16%),
+        linear-gradient(145deg, #392431 0%, #905b71 38%, #f0b490 74%, #322338 100%);
+      position: relative;
+    }
+
+    .review-export-preview::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 42%;
+      background: linear-gradient(180deg, rgba(11, 13, 20, 0), rgba(11, 13, 20, 0.82));
+    }
+
+    .review-export-copy {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      z-index: 1;
+    }
+
+    .review-export-copy strong {
+      display: block;
+      font-size: 22px;
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+
+    .review-export-copy span {
+      display: block;
+      color: rgba(255, 255, 255, 0.74);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .review-success-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: rgba(9, 12, 18, 0.84);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .review-success-copy strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .review-success-copy span {
+      display: block;
+      color: rgba(255, 255, 255, 0.66);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .review-success-pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(126, 242, 223, 0.12);
+      border: 1px solid rgba(126, 242, 223, 0.24);
+      color: #d9fffb;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .review-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(4, 6, 12, 0.62);
+      z-index: 7;
+    }
+
+    .review-modal {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 8;
+      border-radius: 24px;
+      padding: 22px 18px 18px;
+      background: rgba(18, 21, 33, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 44px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(18px);
+    }
+
+    .review-close-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 0;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .review-modal-title {
+      font-size: 24px;
+      line-height: 1.15;
+      font-weight: 800;
+      padding-right: 38px;
+    }
+
+    .review-modal-subtitle {
+      margin-top: 10px;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .review-stars {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 22px;
+    }
+
+    .review-star {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 22px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform 0.18s ease, color 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    }
+
+    .review-star.active {
+      color: #ffd76a;
+      background: rgba(255, 215, 106, 0.14);
+      border-color: rgba(255, 215, 106, 0.34);
+    }
+
+    .review-star:hover {
+      transform: translateY(-1px);
+    }
+
+    .review-options {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .review-option {
+      width: 100%;
+      text-align: left;
+      padding: 14px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .review-option.active {
+      border-color: rgba(47, 107, 255, 0.38);
+      background: rgba(47, 107, 255, 0.16);
+      color: #fff;
+    }
+
+    .review-option.other-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .review-option-input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: 0;
+      outline: 0;
+      color: #fff;
+      font: inherit;
+      padding: 0;
+    }
+
+    .review-option-input::placeholder {
+      color: rgba(255, 255, 255, 0.46);
+    }
+
+    .review-option:hover {
+      transform: translateY(-1px);
+    }
+
+    .review-other-input {
+      width: 100%;
+      min-height: 92px;
+      margin-top: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+      color: #fff;
+      padding: 12px 14px;
+      resize: none;
+      font: inherit;
+      line-height: 1.55;
+    }
+
+    .review-submit-btn {
+      width: 100%;
+      margin-top: 14px;
+      border: 0;
+      border-radius: 16px;
+      padding: 14px 16px;
+      background: linear-gradient(180deg, #3372ff 0%, #2b66f2 100%);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(47, 107, 255, 0.3);
+    }
+
+    .review-submit-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+      box-shadow: none;
+      background: rgba(255, 255, 255, 0.14);
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .review-toast {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 9;
+      transform: translate(-50%, calc(-50% - 12px));
+      width: calc(100% - 52px);
+      max-width: 300px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(11, 13, 20, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      color: #fff;
+      font-size: 13px;
+      line-height: 1.55;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    .review-toast.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+
+    .page {
+      display: grid;
+      grid-template-columns: minmax(560px, 620px) auto;
+      justify-content: center;
+      gap: 20px;
+      padding: 28px 24px;
+      align-items: start;
+      max-width: 1380px;
+      margin: 0 auto;
+    }
+
+    .panel {
+      background: rgba(18, 21, 33, 0.82);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .brief {
+      padding: 28px 24px;
+      position: sticky;
+      top: 18px;
+      max-height: calc(100vh - 36px);
+      overflow: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
+
+    .brief::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .brief::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+    }
+
+    h1, h2, h3, p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 30px;
+      line-height: 1.18;
+      margin-bottom: 12px;
+    }
+
+    .brief p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+
+    .brief-lead {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .backend-req {
+      display: grid;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .backend-group {
+      color: #fff;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .backend-line {
+      display: block;
+    }
+
+    .brief-grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .brief-card {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+    }
+
+    .brief-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .brief-card span {
+      display: block;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 13px;
+    }
+
+    .brief-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .brief-item {
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .brief-item strong {
+      color: #fff;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .chip {
+      border: 1px solid rgba(126, 242, 223, 0.18);
+      background: rgba(126, 242, 223, 0.08);
+      color: #d6fff8;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    .note-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .note {
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 13px;
+    }
+
+    .note-group {
+      display: grid;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .note-line {
+      display: block;
+    }
+
+    .share-copy-example {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #f1f4fb;
+      line-height: 1.55;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .note-action-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .note-action-btn {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(47, 107, 255, 0.14);
+      color: #fff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .note-action-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .ghost-btn:hover,
+    .solid-btn:hover,
+    .icon-btn:hover,
+    .sheet-action:hover,
+    .nav-btn:hover,
+    .gen-option:hover,
+    .tab:hover {
+      transform: translateY(-1px);
+    }
+
+    .prototype-wrap {
+      display: flex;
+      justify-content: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .prototype-side-entry {
+      width: auto;
+      margin-top: 250px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .prototype-stage {
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+      position: relative;
+    }
+
+    .phone-stage {
+      position: relative;
+      display: inline-block;
+    }
+
+    .side-swipe-hint {
+      display: none;
+    }
+
+    .side-swipe-controls {
+      position: absolute;
+      right: -52px;
+      top: 42%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 6;
+    }
+
+    .phone-shell {
+      width: var(--phone-w);
+      min-width: var(--phone-w);
+      height: var(--phone-h);
+      background: #05060b;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 42px;
+      padding: 9px;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(180deg, #10131d 0%, #090b12 100%);
+    }
+
+    .status-bar {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      right: 20px;
+      z-index: 5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .status-icons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 12px;
+    }
+
+    .status-pill {
+      width: 18px;
+      height: 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.88);
+    }
+
+    .feed-screen,
+    .generate-screen,
+    .login-screen {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+    }
+
+    .feed-background {
+      position: absolute;
+      inset: 0;
+      transition: background 0.28s ease;
+      overflow: hidden;
+    }
+
+    .feed-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #111;
+    }
+
+    .video-fallback {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 28px;
+      z-index: 1;
+      background:
+        radial-gradient(circle at top, rgba(93, 136, 255, 0.18), transparent 30%),
+        linear-gradient(180deg, rgba(9, 12, 20, 0.72) 0%, rgba(7, 9, 16, 0.94) 100%);
+    }
+
+    .video-fallback.visible {
+      display: flex;
+    }
+
+    .video-fallback-card {
+      max-width: 260px;
+      padding: 18px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(16, 18, 27, 0.72);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.24);
+    }
+
+    .video-fallback-kicker {
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .video-fallback-title {
+      margin-top: 10px;
+      font-size: 20px;
+      line-height: 1.2;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .video-fallback-desc {
+      margin-top: 8px;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .video-tap-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      cursor: pointer;
+      pointer-events: none;
+    }
+
+    .feed-background::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 22%),
+        radial-gradient(circle at 65% 25%, rgba(255, 255, 255, 0.24), transparent 16%),
+        radial-gradient(circle at 30% 62%, rgba(0, 0, 0, 0.36), transparent 32%);
+      mix-blend-mode: screen;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .feed-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.18) 4%, rgba(0, 0, 0, 0.0) 26%, rgba(0, 0, 0, 0.18) 58%, rgba(0, 0, 0, 0.82) 100%);
+      pointer-events: none;
+    }
+
+    .play-indicator {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3;
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      color: #fff;
+      background: rgba(8, 10, 15, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(14px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+    }
+
+    .play-indicator.visible {
+      opacity: 1;
+    }
+
+    .feed-side {
+      position: absolute;
+      right: 18px;
+      bottom: 154px;
+      z-index: 8;
+      display: grid;
+      gap: 16px;
+      justify-items: center;
+      pointer-events: auto;
+    }
+
+    .icon-stack {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+      position: relative;
+      z-index: 8;
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(20, 21, 25, 0.52);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 11px;
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 8;
+    }
+
+    .icon-btn span {
+      display: block;
+      transform: translateY(-1px);
+      font-size: 14px;
+    }
+
+    .icon-btn.active {
+      background: rgba(255, 107, 125, 0.2);
+      border-color: rgba(255, 107, 125, 0.5);
+      color: #ffd9e0;
+    }
+
+    .metric {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.92);
+      font-weight: 700;
+    }
+
+    .feed-bottom {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 86px;
+      z-index: 3;
+    }
+
+    .video-progress {
+      width: 100%;
+      height: 2px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.18);
+      margin-top: 12px;
+    }
+
+    .video-progress-bar {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: rgba(255, 255, 255, 0.92);
+      transition: width 0.08s linear;
+    }
+
+    .account-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .account-copy {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .account-name {
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1;
+      text-shadow: 0 8px 24px rgba(0, 0, 0, 0.42);
+    }
+
+    .badge {
+      padding: 3px 6px;
+      border-radius: 999px;
+      background: rgba(126, 242, 223, 0.12);
+      border: 1px solid rgba(126, 242, 223, 0.24);
+      color: #cbfff7;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+    }
+
+    .template-title {
+      max-width: 220px;
+      font-size: 14px;
+      line-height: 1.3;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.92);
+      text-shadow: 0 8px 24px rgba(0, 0, 0, 0.42);
+    }
+
+    .primary-action {
+      width: 100%;
+      margin-top: 14px;
+      border: 0;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #3372ff 0%, #2b66f2 100%);
+      color: #fff;
+      padding: 15px 16px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(47, 107, 255, 0.3);
+    }
+
+    .bottom-nav {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 6px;
+      height: 66px;
+      z-index: 4;
+      border-radius: 22px;
+      background: #22201f;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      align-items: center;
+      padding: 6px 10px;
+      box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .nav-item {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      gap: 4px;
+      text-align: center;
+      color: #6f6f70;
+      font-size: 11px;
+      font-weight: 600;
+      min-height: 44px;
+      font: inherit;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav-icon {
+      width: 18px;
+      height: 18px;
+      color: currentColor;
+      opacity: 0.96;
+    }
+
+    .nav-item.active {
+      color: #fff;
+    }
+
+    .nav-label {
+      line-height: 1.1;
+      letter-spacing: 0.1px;
+    }
+
+    .nav-item.active .nav-label {
+      font-weight: 700;
+    }
+
+    .nav-item.inspiration .nav-label {
+      font-size: 11px;
+    }
+
+    .nav-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(18, 21, 33, 0.9);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .preview-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .preview-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .preview-item.active {
+      border-color: rgba(47, 107, 255, 0.45);
+      background: rgba(47, 107, 255, 0.14);
+    }
+
+    .preview-item strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .preview-item span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .sheet-backdrop,
+    .sheet,
+    .toast {
+      position: absolute;
+      z-index: 7;
+      transition: transform 0.22s ease, opacity 0.22s ease;
+    }
+
+    .sheet-backdrop {
+      inset: 0;
+      background: rgba(3, 5, 10, 0.5);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    .sheet-backdrop.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sheet {
+      left: 16px;
+      right: 16px;
+      bottom: 88px;
+      border-radius: 24px;
+      padding: 16px;
+      background: rgba(18, 21, 33, 0.96);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(18px);
+      transform: translateY(120%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 21;
+    }
+
+    .sheet.visible {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .download-modal {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      top: 50%;
+      z-index: 22;
+      border-radius: 22px;
+      padding: 16px;
+      background: rgba(18, 21, 33, 0.98);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(18px);
+      transform: translateY(-46%) scale(0.96);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.22s ease, opacity 0.22s ease;
+    }
+
+    .download-modal.visible {
+      transform: translateY(-50%) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sheet-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      padding-right: 28px;
+    }
+
+    .sheet-close-icon {
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 0;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .sheet-subtitle {
+      display: none;
+    }
+
+    .sheet-actions {
+      display: grid;
+      gap: 10px;
+    }
+
+    .sheet-action {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      color: #fff;
+      border-radius: 16px;
+      padding: 14px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .sheet-action[disabled] {
+      opacity: 0.72;
+      cursor: default;
+    }
+
+    .download-progress {
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .download-progress-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .download-progress-track {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      overflow: hidden;
+    }
+
+    .download-progress-bar {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #5ed1ff, #2f6bff);
+      transition: width 0.16s linear;
+    }
+
+    .download-spinner {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-top-color: #fff;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .toast {
+      left: 50%;
+      right: auto;
+      top: 50%;
+      transform: translate(-50%, calc(-50% - 12px));
+      max-width: 240px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(11, 13, 20, 0.84);
+      border: 1px solid var(--line);
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      font-size: 13px;
+    }
+
+    .toast.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+
+    .back-btn {
+      position: absolute;
+      left: 16px;
+      top: 56px;
+      z-index: 3;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(10, 12, 19, 0.44);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .screen-title {
+      position: absolute;
+      top: 58px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .generate-content {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      top: 112px;
+      bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      width: 100%;
+      max-width: 236px;
+      margin: 0 auto;
+    }
+
+    .tab {
+      flex: 1;
+      border-radius: 999px;
+      padding: 11px 12px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      color: #111;
+      background: linear-gradient(90deg, #c1fff7, #ffffff);
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field-label {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .model-row,
+    .template-row,
+    .option-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .model-name {
+      color: #62a7ff;
+      font-weight: 700;
+    }
+
+    .prompt-box {
+      min-height: 186px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 14px;
+      color: rgba(255, 255, 255, 0.86);
+      line-height: 1.55;
+      font-size: 13px;
+      position: relative;
+    }
+
+    .prompt-counter {
+      position: absolute;
+      right: 12px;
+      bottom: 10px;
+      color: var(--subtle);
+      font-size: 12px;
+    }
+
+    .ref-image {
+      width: 95px;
+      height: 126px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #95d6ff, #f6b8c2);
+      margin: 4px auto 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ref-image::before,
+    .ref-image::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.55);
+    }
+
+    .ref-image::before {
+      width: 28px;
+      height: 28px;
+      top: 22px;
+      left: 33px;
+    }
+
+    .ref-image::after {
+      width: 54px;
+      height: 54px;
+      bottom: 16px;
+      left: 20px;
+      border-radius: 44% 44% 38% 38%;
+    }
+
+    .template-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 170px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 13px;
+    }
+
+    .option-row {
+      gap: 10px;
+      justify-content: flex-start;
+    }
+
+    .gen-option {
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 11px;
+      padding: 9px 14px;
+      color: rgba(255, 255, 255, 0.92);
+      font-weight: 700;
+      font-size: 13px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .generate-btn {
+      margin-top: auto;
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 15px 16px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 800;
+      font-size: 16px;
+      box-shadow: 0 14px 34px rgba(47, 107, 255, 0.32);
+      cursor: pointer;
+    }
+
+    .generate-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .login-screen {
+      background:
+        radial-gradient(circle at 72% 14%, rgba(104, 65, 255, 0.4), transparent 20%),
+        radial-gradient(circle at 18% 10%, rgba(65, 86, 255, 0.34), transparent 26%),
+        linear-gradient(180deg, rgba(14, 18, 38, 0.95) 0%, rgba(10, 12, 18, 1) 100%);
+    }
+
+    .login-art {
+      position: absolute;
+      inset: 56px 0 220px;
+      opacity: 0.86;
+      pointer-events: none;
+    }
+
+    .art-card {
+      position: absolute;
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02)),
+        linear-gradient(135deg, #161d49, #392071 55%, #0d1024);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .art-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 35% 30%, rgba(111, 183, 255, 0.5), transparent 18%),
+        radial-gradient(circle at 70% 62%, rgba(255, 61, 107, 0.42), transparent 24%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 40%);
+    }
+
+    .login-copy {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 34px;
+      z-index: 3;
+      text-align: center;
+    }
+
+    .login-title {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .login-subtitle {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+      margin-bottom: 22px;
+    }
+
+    .login-btn {
+      width: 100%;
+      border-radius: 999px;
+      padding: 16px;
+      margin-top: 12px;
+      border: 1px solid rgba(47, 107, 255, 0.58);
+      background: var(--primary);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .login-btn.secondary {
+      background: rgba(47, 107, 255, 0.08);
+      color: #7fb5ff;
+    }
+
+    .login-footer {
+      margin-top: 18px;
+      color: var(--subtle);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .landing-screen {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+      background: #050505;
+    }
+
+    .phone-screen.landing-mode .status-bar {
+      color: #111;
+    }
+
+    .phone-screen.landing-mode .status-icons {
+      color: rgba(17, 17, 17, 0.92);
+    }
+
+    .phone-screen.landing-mode .status-pill {
+      border-color: rgba(17, 17, 17, 0.92);
+    }
+
+    .prototype-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .prototype-action-btn {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .prototype-action-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .landing-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .landing-header {
+      position: absolute;
+      top: 38px;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: #fff;
+      color: #111;
+      display: grid;
+      grid-template-columns: 44px 1fr 44px;
+      align-items: center;
+      padding: 0 14px;
+      border-bottom: 1px solid rgba(17, 17, 17, 0.08);
+      z-index: 3;
+    }
+
+    .landing-header-btn {
+      border: 0;
+      background: transparent;
+      color: #111;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .landing-header-btn.more {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .landing-brand {
+      text-align: center;
+      min-width: 0;
+    }
+
+    .landing-brand-name {
+      font-size: 17px;
+      line-height: 1.1;
+      font-weight: 800;
+      color: #111;
+    }
+
+    .landing-brand-domain {
+      display: none;
+    }
+
+    .landing-stage {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 102px;
+      bottom: 0;
+      background: #050505;
+      overflow: hidden;
+    }
+
+    .landing-preview {
+      position: relative;
+      width: 100%;
+      height: calc(100% - 144px);
+      overflow: hidden;
+      background: #050505;
+      display: grid;
+      place-items: center;
+    }
+
+    .landing-preview video {
+      width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .landing-video-fallback {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      z-index: 1;
+      background:
+        radial-gradient(circle at top, rgba(93, 136, 255, 0.16), transparent 32%),
+        linear-gradient(180deg, rgba(7, 9, 14, 0.74) 0%, rgba(5, 5, 5, 0.96) 100%);
+    }
+
+    .landing-video-fallback.visible {
+      display: flex;
+    }
+
+    .landing-preview::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.22) 100%);
+      pointer-events: none;
+    }
+
+    .landing-play-btn {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+      font-size: 28px;
+      display: grid;
+      place-items: center;
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .landing-play-btn.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .landing-footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      min-height: 124px;
+      background: linear-gradient(180deg, rgba(5, 5, 5, 0) 0%, #050505 18%, #050505 100%);
+      padding: 14px 18px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .landing-meta {
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .landing-title {
+      margin-top: 4px;
+      font-size: 17px;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .landing-subtitle {
+      display: none;
+    }
+
+    .landing-cta-row {
+      display: flex;
+      justify-content: center;
+    }
+
+    .landing-primary-btn {
+      min-width: 170px;
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 22px;
+      color: #111;
+      background: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+    }
+
+    .landing-footnote {
+      display: none;
+    }
+
+    .home-redesign-page {
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    .home-redesign-layout {
+      display: grid;
+      grid-template-columns: minmax(360px, 460px) 390px;
+      justify-content: center;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .home-redesign-brief {
+      padding: 28px 24px;
+      position: sticky;
+      top: 18px;
+      max-height: calc(100vh - 36px);
+      overflow: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
+
+    .home-redesign-brief::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .home-redesign-brief::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+    }
+
+    .home-redesign-prototype-wrap {
+      display: flex;
+      justify-content: center;
+      width: 390px;
+    }
+
+    .home-redesign-screen {
+      background:
+        radial-gradient(circle at top, rgba(65, 128, 255, 0.24), transparent 24%),
+        linear-gradient(180deg, #0d1423 0%, #070910 100%);
+    }
+
+    .home-hub-screen,
+    .home-preview-screen,
+    .home-generate-screen {
+      position: absolute;
+      inset: 0;
+    }
+
+    .home-hub-scroll {
+      position: absolute;
+      inset: 0;
+      overflow: auto;
+      padding: 0 16px 108px;
+      scrollbar-width: none;
+    }
+
+    .home-hub-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .home-hero {
+      display: grid;
+      gap: 12px;
+      margin-top: 64px;
+      margin-bottom: 18px;
+    }
+
+    .home-hero-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .home-brand-lockup strong {
+      display: block;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .home-badge-pill {
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255, 208, 102, 0.16);
+      border: 1px solid rgba(255, 208, 102, 0.28);
+      color: #ffe8b2;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .home-featured-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .home-featured-card {
+      position: relative;
+      min-height: 112px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.18);
+    }
+
+    .home-featured-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.62));
+    }
+
+    .home-featured-card strong {
+      position: absolute;
+      left: 14px;
+      z-index: 1;
+    }
+
+    .home-featured-card strong {
+      bottom: 14px;
+      right: 14px;
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
+    .home-featured-card.one {
+      background:
+        linear-gradient(140deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.08)),
+        linear-gradient(135deg, #152847 0%, #24467a 48%, #5876e6 100%);
+    }
+
+    .home-featured-card.two {
+      background:
+        linear-gradient(140deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.08)),
+        linear-gradient(135deg, #24153b 0%, #4e2c6d 50%, #b879d9 100%);
+    }
+
+    .home-quick-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .home-quick-action {
+      min-height: 82px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      gap: 8px;
+      padding: 12px 10px;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    .home-quick-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(47, 107, 255, 0.14);
+      border: 1px solid rgba(47, 107, 255, 0.3);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .home-module-tabs {
+      margin-top: 0;
+      display: flex;
+      gap: 8px;
+      position: sticky;
+      top: 44px;
+      z-index: 16;
+      padding: 10px 0 12px;
+      background: linear-gradient(180deg, rgba(10, 14, 24, 1), rgba(10, 14, 24, 0.96) 72%, rgba(10, 14, 24, 0));
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 16px rgba(4, 8, 16, 0.14);
+    }
+
+    .home-module-tab {
+      flex: 1;
+      min-width: 0;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.045);
+      color: rgba(255, 255, 255, 0.68);
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    }
+
+    .home-module-tab.active {
+      color: #fff;
+      background: rgba(47, 107, 255, 0.18);
+      border-color: rgba(47, 107, 255, 0.42);
+    }
+
+    .home-waterfall-grid {
+      margin-top: 2px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      align-items: start;
+    }
+
+    .home-waterfall-column {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .home-template-card {
+      position: relative;
+      aspect-ratio: 3 / 4;
+      border: 0;
+      border-radius: 18px;
+      overflow: hidden;
+      cursor: pointer;
+      padding: 0;
+      text-align: left;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 16px 30px rgba(0, 0, 0, 0.16);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .home-template-card.ratio-4-3 {
+      aspect-ratio: 4 / 3;
+    }
+
+    .home-template-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 36px rgba(0, 0, 0, 0.22);
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+
+    .home-template-art {
+      position: absolute;
+      inset: 0;
+      background-position: center;
+      background-size: cover;
+    }
+
+    .home-template-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      filter: saturate(1.08) contrast(1.02);
+      background: #111;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+    }
+
+    .home-template-video.ready {
+      opacity: 1;
+    }
+
+    .home-template-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0.02) 40%, rgba(0, 0, 0, 0.68) 100%);
+      pointer-events: none;
+    }
+
+    .home-template-title,
+    .home-template-meta,
+    .home-template-play {
+      position: absolute;
+      z-index: 1;
+    }
+
+    .home-template-play {
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(9, 12, 20, 0.48);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      font-size: 15px;
+    }
+
+    .home-template-title {
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      font-size: 15px;
+      line-height: 1.28;
+      font-weight: 800;
+    }
+
+    .home-template-meta {
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.74);
+      display: none;
+    }
+
+    .home-template-card.ratio-4-3 .home-template-title {
+      bottom: 10px;
+      font-size: 14px;
+    }
+
+    .home-template-card.ratio-4-3 .home-template-meta {
+      font-size: 10px;
+    }
+
+    .home-preview-screen {
+      background:
+        radial-gradient(circle at top, rgba(65, 128, 255, 0.22), transparent 22%),
+        linear-gradient(180deg, #10131d 0%, #090b12 100%);
+    }
+
+    .home-preview-back {
+      position: absolute;
+      left: 16px;
+      top: 56px;
+      z-index: 8;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(10, 12, 19, 0.44);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .home-preview-label {
+      display: none;
+    }
+
+    .home-preview-hero {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .home-preview-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #111;
+    }
+
+    .home-preview-video-fallback {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 28px;
+      z-index: 2;
+      background:
+        radial-gradient(circle at top, rgba(93, 136, 255, 0.18), transparent 30%),
+        linear-gradient(180deg, rgba(9, 12, 20, 0.72) 0%, rgba(7, 9, 16, 0.94) 100%);
+    }
+
+    .home-preview-video-fallback.visible {
+      display: flex;
+    }
+
+    .home-preview-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 22%),
+        radial-gradient(circle at 68% 18%, rgba(255, 255, 255, 0.2), transparent 16%),
+        radial-gradient(circle at 32% 72%, rgba(0, 0, 0, 0.34), transparent 30%);
+      mix-blend-mode: screen;
+      opacity: 0.48;
+    }
+
+    .home-preview-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.16) 4%, rgba(0, 0, 0, 0.0) 24%, rgba(0, 0, 0, 0.14) 56%, rgba(0, 0, 0, 0.84) 100%);
+      pointer-events: none;
+    }
+
+    .home-preview-play {
+      position: absolute;
+      left: 50%;
+      top: 48%;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      color: #fff;
+      background: rgba(8, 10, 15, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(14px);
+      transition: opacity 0.18s ease;
+    }
+
+    .home-preview-play.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .home-preview-side {
+      position: absolute;
+      right: 18px;
+      bottom: 154px;
+      z-index: 8;
+      display: grid;
+      gap: 16px;
+      justify-items: center;
+    }
+
+    .home-preview-icon-stack {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+    }
+
+    .home-preview-icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(20, 21, 25, 0.52);
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      backdrop-filter: blur(10px);
+    }
+
+    .home-preview-icon-btn.active {
+      background: rgba(255, 107, 125, 0.2);
+      border-color: rgba(255, 107, 125, 0.5);
+      color: #ffd9e0;
+    }
+
+    .home-preview-metric {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.92);
+      font-weight: 700;
+    }
+
+    .home-preview-bottom {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 86px;
+      z-index: 6;
+    }
+
+    .home-preview-account {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .home-preview-title {
+      max-width: 220px;
+      font-size: 14px;
+      line-height: 1.3;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.94);
+      text-shadow: 0 8px 24px rgba(0, 0, 0, 0.42);
+    }
+
+    .home-preview-subtitle {
+      display: none;
+    }
+
+    .home-preview-bottom .primary-action {
+      margin-top: 14px;
+    }
+
+    .home-preview-progress {
+      width: 100%;
+      height: 2px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.18);
+      margin-top: 12px;
+    }
+
+    .home-preview-progress-bar {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: rgba(255, 255, 255, 0.92);
+      transition: width 0.08s linear;
+    }
+
+    .home-generate-screen {
+      padding: 56px 16px 18px;
+      background:
+        radial-gradient(circle at top, rgba(93, 136, 255, 0.18), transparent 30%),
+        linear-gradient(180deg, rgba(9, 12, 20, 0.72) 0%, rgba(7, 9, 16, 0.94) 100%);
+    }
+
+    .home-generate-back {
+      position: absolute;
+      left: 16px;
+      top: 56px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .home-generate-title {
+      text-align: center;
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 18px;
+    }
+
+    .home-generate-content {
+      display: grid;
+      gap: 16px;
+    }
+
+    .home-generate-note {
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: center;
+      margin-top: 2px;
+    }
+
+    .home-preview-sheet-backdrop {
+      position: absolute;
+    }
+
+    .home-preview-sheet,
+    .home-preview-toast {
+      position: absolute;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 1120px) {
+      .workspace {
+        padding: 16px;
+      }
+
+      .review-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .home-redesign-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .page {
+        grid-template-columns: 1fr;
+      }
+
+      .brief {
+        position: static;
+        max-height: none;
+      }
+
+      .prototype-wrap {
+        justify-content: center;
+      }
+
+      .home-redesign-prototype-wrap {
+        width: 100%;
+      }
+
+      .prototype-side-entry {
+        width: auto;
+        margin-top: 0;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        padding: 16px;
+      }
+
+      .phone-shell {
+        transform: scale(0.94);
+        transform-origin: top center;
+        margin-bottom: -40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="workspace">
+    <div class="root-tabs panel">
+      <button class="root-tab-btn active" data-root-tab-btn="requirements">Novi AI APP V2.3.5需求列表</button>
+      <button class="root-tab-btn" data-root-tab-btn="tracking">埋点列表</button>
+      <button class="root-tab-btn" data-root-tab-btn="home-redesign">首页改版</button>
+      <button class="root-tab-btn" data-root-tab-btn="inspiration">灵感流</button>
+      <button class="root-tab-btn" data-root-tab-btn="review">商店评价引导</button>
+    </div>
+
+    <section class="root-tab-panel active" data-root-tab-panel="requirements">
+      <div class="data-page">
+        <div class="data-panel panel">
+          <div class="data-header">
+            <div class="data-header-copy">
+              <h1>Novi AI APP V2.3.5需求列表</h1>
+            </div>
+          </div>
+          <div class="data-table-wrap data-table-wrap--requirements">
+            <table class="data-table" id="requirementsTable"></table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="root-tab-panel" data-root-tab-panel="tracking">
+      <div class="data-page">
+        <div class="data-panel panel">
+          <div class="data-header">
+            <div class="data-header-copy">
+              <h1>埋点列表</h1>
+            </div>
+          </div>
+          <div class="data-table-wrap">
+            <table class="data-table" id="trackingTable"></table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="root-tab-panel" data-root-tab-panel="home-redesign">
+      <div class="home-redesign-page">
+        <div class="home-redesign-layout">
+          <aside class="home-redesign-brief panel">
+            <h1>首页推荐视频改版 Home</h1>
+
+            <div class="section">
+              <h2>页面定位</h2>
+              <div class="brief-grid">
+                <div class="brief-card">
+                  <strong>首页推荐</strong>
+                  <span>轻推荐 + 快速决策 + 导流进入创作。</span>
+                </div>
+                <div class="brief-card">
+                  <strong>灵感流</strong>
+                  <span>沉浸浏览 + 连续种草 + 内容消费。</span>
+                </div>
+                <div class="brief-card">
+                  <strong>说明</strong>
+                  <span>首页推荐作为快速决策入口，旨在帮助用户更高效地完成模板选择与创作转化；灵感流作为沉浸式内容消费场，承担更完整的刷内容、互动与种草职责。首页负责“选”，灵感流负责“刷”，两者不是重复建设，而是前后衔接的互补关系。</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h2>一、需求概述</h2>
+              <div class="brief-list">
+                <div class="brief-item">首页推荐区域由旧长视频老模板展示改为 Trending 推荐热门趋势视频及 Clip 短视频双 Tab 展示。</div>
+                <div class="brief-item">模板视频预览页优化，界面与灵感流视频样式统一，支持点赞、分享、创建同款。</div>
+                <div class="brief-item">模板展示由固定 `3:4` 改为瀑布流交错展示（`3:4` 或 `4:3`）。</div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h2>三、功能需求</h2>
+              <div class="brief-list">
+                <div class="brief-item"><strong>1. Tab切换：</strong>推荐区 Tab 提供 `Trending` 与 `Clip` 两个池，用户点击后在当前页面内完成切换。</div>
+                <div class="brief-item"><strong>2. 卡片展示：</strong>首页卡片仅展示静态封面、播放按钮与模板标题；模板区采用双列弱瀑布流布局，左右等宽，仅使用 `3:4` 与 `4:3` 两种固定卡片比例，不允许自由高度。卡片按固定节奏交错排布，既保留一定内容流感，也保证首页整齐度与可扫视性。</div>
+                <div class="brief-item">
+                  <strong>卡片比例映射规则：</strong>
+                  <div class="backend-req">
+                    <span class="backend-line">原始视频素材比例不直接决定首页卡片比例。</span>
+                    <span class="backend-line">竖屏素材（宽高比 &lt; 1）映射到 `3:4`。</span>
+                    <span class="backend-line">横屏素材（宽高比 &gt; 1）映射到 `4:3`。</span>
+                    <span class="backend-line">方形素材（宽高比 = 1）默认映射到 `3:4`。</span>
+                    <span class="backend-line">首页封面/首帧按 `cover` 填充容器，允许裁切；点击进入预览页后，再按真实视频比例播放。</span>
+                  </div>
+                </div>
+                <div class="brief-item"><strong>3. Tab吸顶：</strong>Tab 区在页面滚动后吸顶至系统状态栏下方，保证用户在浏览不同模板时可随时切换推荐池，无需回到顶部重新操作。</div>
+                <div class="brief-item"><strong>4. 预览承接：</strong>点击任一卡片后进入单条模板预览页，页面自动播放真实模板视频，并展示账号、点赞、分享与 `Create Same` 主按钮。</div>
+                <div class="brief-item"><strong>5. 生成链路：</strong>`Create Same` 进入生成页时，需带入模板对应的基础信息；从生成页返回时，应回到原模板预览页，保证链路闭环。</div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h2>四、推荐排序规则</h2>
+              <div class="note-list">
+                <div class="note">
+                  <strong>多重优先级：</strong>
+                  <div class="note-group">
+                    <span class="note-line">Trending：点赞数 &gt; 后台排序权重 &gt; 发布时间</span>
+                    <span class="note-line">Clip：发布时间 &gt; 点赞数 &gt; 后台排序权重</span>
+                  </div>
+                </div>
+                <div class="note">
+                  <strong>排序说明：</strong>
+                  <div class="note-group">
+                    <span class="note-line">点赞数，按从高到低排序。</span>
+                    <span class="note-line">后台排序权重，按从高到低排序（数字越高，权重越高）。</span>
+                    <span class="note-line">发布时间，按从新到旧排序。</span>
+                  </div>
+                </div>
+                <div class="note"><strong>Trending：</strong>优先承载高热度、高验证度模板，用于提升用户快速决策效率。</div>
+                <div class="note"><strong>Clip：</strong>优先承载新品分类模板，用于补充新鲜感与冷启动曝光，同时保留热度与后台调控能力。</div>
+              </div>
+            </div>
+          </aside>
+
+          <main class="home-redesign-prototype-wrap">
+            <div class="prototype-stage">
+              <div class="phone-stage">
+                <div class="phone-shell">
+                  <div class="phone-screen home-redesign-screen" id="homeRedesignScreen">
+                    <div class="status-bar">
+                      <span>9:41</span>
+                      <div class="status-icons">
+                        <span>5G</span>
+                        <span class="status-pill"></span>
+                      </div>
+                    </div>
+
+                    <section class="home-hub-screen" id="homeHubScreen">
+                      <div class="home-hub-scroll">
+                        <div class="home-hero">
+                          <div class="home-hero-top">
+                            <div class="home-brand-lockup">
+                              <strong>Novi AI</strong>
+                            </div>
+                            <div class="home-badge-pill">20 coins</div>
+                          </div>
+
+                          <div class="home-featured-row">
+                            <div class="home-featured-card one">
+                              <strong>AI Shorts</strong>
+                            </div>
+                            <div class="home-featured-card two">
+                              <strong>Character Vlog</strong>
+                            </div>
+                          </div>
+
+                          <div class="home-quick-actions">
+                            <div class="home-quick-action">
+                              <div class="home-quick-icon">A</div>
+                              <div>Create Character</div>
+                            </div>
+                            <div class="home-quick-action">
+                              <div class="home-quick-icon">I</div>
+                              <div>Image to Video</div>
+                            </div>
+                            <div class="home-quick-action">
+                              <div class="home-quick-icon">T</div>
+                              <div>Text to Video</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="home-module-tabs">
+                          <button class="home-module-tab active" data-home-module-tab="trending">Trending</button>
+                          <button class="home-module-tab" data-home-module-tab="clips">Clip</button>
+                        </div>
+
+                        <div class="home-waterfall-grid" id="homeWaterfallGrid"></div>
+                      </div>
+
+                      <div class="bottom-nav">
+                        <button class="nav-item active" id="homeRedesignNavHome" type="button">
+                          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M12 3.2 4.2 9.6c-.5.4-.7.9-.7 1.5v8.1c0 .9.7 1.6 1.6 1.6H9c.5 0 .9-.4.9-.9v-4.4c0-.6.5-1 1-1h2.2c.6 0 1 .4 1 1v4.4c0 .5.4.9.9.9h3.9c.9 0 1.6-.7 1.6-1.6V11c0-.6-.3-1.1-.7-1.5L12 3.2Z"/>
+                          </svg>
+                          <div class="nav-label">Home</div>
+                        </button>
+                        <button class="nav-item inspiration" id="homeRedesignNavInspiration" type="button">
+                          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M7.2 3.8h9.6c.8 0 1.4.6 1.4 1.4v3.4l1.6.9c.5.3.8.8.8 1.4v6.8c0 .8-.6 1.4-1.4 1.4H4.8c-.8 0-1.4-.6-1.4-1.4v-6.8c0-.6.3-1.1.8-1.4l1.6-.9V5.2c0-.8.6-1.4 1.4-1.4Zm1.3 2.5v1.2h7V6.3h-7Zm3.1 4.1v5.1l4.4-2.5-4.4-2.6Z"/>
+                            <rect x="3.4" y="9.7" width="17.2" height="9.3" rx="1.8" fill="currentColor"/>
+                            <path d="M11.2 11.4v5l4.4-2.5-4.4-2.5Z" fill="#22201f"/>
+                          </svg>
+                          <div class="nav-label">Inspiration</div>
+                        </button>
+                        <div class="nav-item">
+                          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <rect x="4.2" y="6.2" width="15.6" height="11.8" rx="2.4"/>
+                            <path d="M6.8 8.5h10.4c.6 0 1 .4 1 1v1.4H5.8V9.5c0-.6.4-1 1-1Z" fill="#22201f" opacity=".22"/>
+                            <path d="M9.1 4.4h5.8c.5 0 .9.4.9.9v1H8.2v-1c0-.5.4-.9.9-.9Z"/>
+                          </svg>
+                          <div class="nav-label">Assets</div>
+                        </div>
+                        <div class="nav-item">
+                          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <circle cx="12" cy="8.3" r="3.8"/>
+                            <path d="M4.8 19c0-3.3 3.2-5.6 7.2-5.6s7.2 2.3 7.2 5.6c0 .6-.5 1.1-1.1 1.1H5.9c-.6 0-1.1-.5-1.1-1.1Z"/>
+                          </svg>
+                          <div class="nav-label">Mine</div>
+                        </div>
+                      </div>
+                    </section>
+
+                    <section class="home-preview-screen hidden" id="homePreviewScreen">
+                      <button class="home-preview-back" id="homePreviewBackBtn">&#8592;</button>
+                      <div class="home-preview-label" id="homePreviewModuleLabel">Trending</div>
+                      <div class="home-preview-hero" id="homePreviewHero">
+                        <video class="home-preview-video" id="homePreviewVideo" muted loop playsinline></video>
+                        <div class="home-preview-video-fallback" id="homePreviewVideoFallback">
+                          <div class="video-fallback-card">
+                            <div class="video-fallback-kicker">Template Preview</div>
+                            <div class="video-fallback-title" id="homePreviewFallbackTitle">Video Preview</div>
+                            <div class="video-fallback-desc">Video preview is unavailable on this device. You can still review the layout and interaction flow.</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="home-preview-overlay"></div>
+                      <button class="home-preview-play" id="homePreviewPlayBtn">▶</button>
+
+                      <div class="home-preview-side">
+                        <div class="home-preview-icon-stack">
+                          <button class="home-preview-icon-btn" id="homePreviewLikeBtn">♥</button>
+                          <div class="home-preview-metric" id="homePreviewLikeCount">0</div>
+                        </div>
+                        <div class="home-preview-icon-stack">
+                          <button class="home-preview-icon-btn" id="homePreviewShareBtn">↗</button>
+                          <div class="home-preview-metric" id="homePreviewShareCount">0</div>
+                        </div>
+                      </div>
+
+                      <div class="home-preview-bottom">
+                        <div class="home-preview-account">
+                          <span class="account-name">NoviAI_Video</span>
+                          <span class="badge">Official</span>
+                        </div>
+                        <div class="home-preview-title" id="homePreviewTitle">Office Bunny</div>
+                        <div class="home-preview-subtitle" id="homePreviewSubtitle">Trending pick · high engagement</div>
+                        <button class="primary-action" id="homePreviewCreateBtn">Create Same</button>
+                        <div class="home-preview-progress" aria-hidden="true">
+                          <div class="home-preview-progress-bar" id="homePreviewProgressBar"></div>
+                        </div>
+                      </div>
+
+                      <div class="sheet-backdrop home-preview-sheet-backdrop" id="homePreviewShareBackdrop"></div>
+                      <div class="sheet home-preview-sheet" id="homePreviewShareSheet">
+                        <button class="sheet-close-icon" id="homePreviewCloseShareBtn">×</button>
+                        <div class="sheet-title">Share This Template</div>
+                        <div class="sheet-actions">
+                          <button class="sheet-action" id="homePreviewCopyBtn">
+                            <span>Copy Link</span>
+                          </button>
+                          <button class="sheet-action" id="homePreviewDownloadBtn">
+                            <span>Download Video</span>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="toast home-preview-toast" id="homePreviewToast"></div>
+
+                      <div class="bottom-nav">
+                        <button class="nav-item active" id="homePreviewNavHome" type="button">
+                          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M12 3.2 4.2 9.6c-.5.4-.7.9-.7 1.5v8.1c0 .9.7 1.6 1.6 1.6H9c.5 0 .9-.4.9-.9v-4.4c0-.6.5-1 1-1h2.2c.6 0 1 .4 1 1v4.4c0 .5.4.9.9.9h3.9c.9 0 1.6-.7 1.6-1.6V11c0-.6-.3-1.1-.7-1.5L12 3.2Z"/>
+                          </svg>
+                          <div class="nav-label">Home</div>
+                        </button>
+                        <button class="nav-item inspiration" id="homePreviewNavInspiration" type="button">
+                          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M7.2 3.8h9.6c.8 0 1.4.6 1.4 1.4v3.4l1.6.9c.5.3.8.8.8 1.4v6.8c0 .8-.6 1.4-1.4 1.4H4.8c-.8 0-1.4-.6-1.4-1.4v-6.8c0-.6.3-1.1.8-1.4l1.6-.9V5.2c0-.8.6-1.4 1.4-1.4Zm1.3 2.5v1.2h7V6.3h-7Zm3.1 4.1v5.1l4.4-2.5-4.4-2.6Z"/>
+                            <rect x="3.4" y="9.7" width="17.2" height="9.3" rx="1.8" fill="currentColor"/>
+                            <path d="M11.2 11.4v5l4.4-2.5-4.4-2.5Z" fill="#22201f"/>
+                          </svg>
+                          <div class="nav-label">Inspiration</div>
+                        </button>
+                        <div class="nav-item">
+                          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <rect x="4.2" y="6.2" width="15.6" height="11.8" rx="2.4"/>
+                            <path d="M6.8 8.5h10.4c.6 0 1 .4 1 1v1.4H5.8V9.5c0-.6.4-1 1-1Z" fill="#22201f" opacity=".22"/>
+                            <path d="M9.1 4.4h5.8c.5 0 .9.4.9.9v1H8.2v-1c0-.5.4-.9.9-.9Z"/>
+                          </svg>
+                          <div class="nav-label">Assets</div>
+                        </div>
+                        <div class="nav-item">
+                          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <circle cx="12" cy="8.3" r="3.8"/>
+                            <path d="M4.8 19c0-3.3 3.2-5.6 7.2-5.6s7.2 2.3 7.2 5.6c0 .6-.5 1.1-1.1 1.1H5.9c-.6 0-1.1-.5-1.1-1.1Z"/>
+                          </svg>
+                          <div class="nav-label">Mine</div>
+                        </div>
+                      </div>
+                    </section>
+
+                    <section class="home-generate-screen hidden" id="homeGenerateScreen">
+                      <button class="home-generate-back" id="homeBackFromGenerate">&#8592;</button>
+                      <div class="home-generate-title">Generate Clip</div>
+
+                      <div class="home-generate-content">
+                        <div class="tabs">
+                          <button class="tab" id="homeImageTab">Image to Video</button>
+                          <button class="tab" id="homeTextTab">Text to Video</button>
+                        </div>
+
+                        <div class="field">
+                          <div class="field-label">Model</div>
+                          <div class="card model-row">
+                            <span>Selected Model</span>
+                            <span class="model-name" id="homeModelName">Seedance 2.0</span>
+                          </div>
+                        </div>
+
+                        <div class="field hidden" id="homeReferenceField">
+                          <div class="field-label">Reference Image</div>
+                          <div class="card">
+                            <div class="ref-image"></div>
+                            <div class="template-row">
+                              <span>Template</span>
+                              <span class="template-pill" id="homeReferenceTemplate">Office Bunny</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="field">
+                          <div class="field-label">Prompt</div>
+                          <div class="card prompt-box">
+                            <span id="homePromptBody"></span>
+                            <span class="prompt-counter" id="homePromptCounter">0 / 5000</span>
+                          </div>
+                        </div>
+
+                        <div class="field">
+                          <div class="field-label">Template</div>
+                          <div class="card template-row">
+                            <span>Preset</span>
+                            <span class="template-pill" id="homeTemplatePreset">Office Bunny</span>
+                          </div>
+                        </div>
+
+                        <div class="field">
+                          <div class="field-label">Options</div>
+                          <div class="option-row">
+                            <div class="gen-option" id="homeResolutionOpt">720P</div>
+                            <div class="gen-option" id="homeDurationOpt">10S</div>
+                            <div class="gen-option" id="homeRatioOpt">9:16</div>
+                          </div>
+                        </div>
+
+                        <button class="generate-btn" id="homeGenerateBtn">Generate</button>
+                        <div class="home-generate-note" id="homeGenerateNote">Prompt and generation parameters are prefilled from Home Recommendation.</div>
+                      </div>
+                    </section>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </section>
+
+    <section class="root-tab-panel" data-root-tab-panel="inspiration">
+      <div class="page">
+    <aside class="brief panel">
+      <h1>Inspiration 灵感广场</h1>
+
+      <div class="section">
+        <h2>一、需求概述</h2>
+        <div class="brief-grid">
+          <div class="brief-card">
+            <strong>一句话说明</strong>
+            <span>将底部 `Clips Tab` 升级为 `Inspiration` 灵感广场，以全屏竖版短视频流承载官方模板内容，建立从内容消费到模板创建的高转化发现链路。</span>
+          </div>
+          <div class="brief-card">
+            <strong>背景问题</strong>
+            <span>当前 `Clips` 承载的特效模板内容老旧，页面形态偏模板列表，不符合海外用户主流的短视频浏览习惯，导致内容停留与创作转化能力有限。</span>
+          </div>
+          <div class="brief-card">
+            <strong>版本目标</strong>
+            <span>通过“先刷视频种草，再一键创建同款”的路径，提升灵感广场内容消费深度、模板点击率与进入生成页后的最终生成转化。</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>二、需求目标与范围</h2>
+        <div class="brief-list">
+          <div class="brief-item"><strong>目标用户：</strong>海外内容消费型用户、创意探索型用户、被模板内容吸引并具备潜在生成意愿的轻中度创作者。</div>
+          <div class="brief-item"><strong>本期目标：</strong>验证灵感流是否能提升模板“被看见”与“被点击创建”的能力，优先关注发现链路，不扩展复杂社区能力。</div>
+          <div class="brief-item"><strong>本期包含：</strong>Inspiration 信息流、官方模板内容、点赞、分享、Create Same、文生/图生目标页带参预填。</div>
+          <div class="brief-item"><strong>本期不含：</strong>UGC 发布、评论、关注、个人主页、复杂推荐算法、多频道分类、点赞列表。</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>三、前台功能需求</h2>
+        <div class="brief-list">
+          <div class="brief-item"><strong>1. Tab 改版：</strong>底部导航原 `Clips` 入口更名为 `Inspiration`，维持原导航层级与位置，降低用户学习成本。</div>
+          <div class="brief-item"><strong>2. 页面形态：</strong>首页采用全屏竖版视频流，单屏展示单条模板视频，支持上下切换内容。</div>
+          <div class="brief-item"><strong>3. 内容策略：</strong>V1 仅展示官方模板内容，统一以 `NoviAI_Official` 身份露出，强化内容可信度与平台官方调性。</div>
+          <div class="brief-item"><strong>4. 内容信息层：</strong>单条内容需展示官方账号、官方标识、模板标题、点赞数、分享数与主行动按钮 `Create Same`。</div>
+          <div class="brief-item"><strong>5. 模板类型：</strong>同时支持文生视频与图生视频模板；图生视频模板需具备参考图信息，并可传递至目标功能页。</div>
+          <div class="brief-item"><strong>6. 分享能力：</strong>支持复制链接、下载视频；分享对象为当前单条模板视频，链接需可回流至对应模板内容。</div>
+          <div class="brief-item"><strong>7. 分享预览页：</strong>分享链接落地后需提供模板视频预览页，用于承接外部渠道点击流量；页面需展示 `Novi AI` 品牌头、模板视频预览、官方账号 `NoviAI_Video`、模板标题与主行动按钮 `Create Same →`。用户在该 H5 页点击 `Create Same →` 时：已安装 App 则唤起并回流至对应单个模板详情页；未安装则跳转应用下载页（App Store / Google Play）。</div>
+          <div class="brief-item"><strong>8. 推荐排序：</strong>前台默认优先展示未看过视频；同等条件下，点赞高内容优先于默认排序内容；内容刷到底后循环继续。</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>四、交互逻辑说明</h2>
+        <div class="note-list">
+          <div class="note"><strong>1. 进入页面：</strong>用户进入 `Inspiration` 后默认落在推荐视频流，视频自动播放、单条循环，不再展示传统模板列表说明。</div>
+          <div class="note"><strong>2. 播放控制：</strong>用户点击视频区域可暂停/继续播放；页面底部展示播放进度条，用于反馈当前视频播放进度。</div>
+          <div class="note"><strong>3. 上下切换：</strong>支持上下切换下一条/上一条模板视频；切换后自动播放新视频；内容刷到底后继续循环，不出现空态拦截。</div>
+          <div class="note"><strong>4. 点赞逻辑：</strong>游客点击点赞跳转登录页；登录用户可完成点赞/取消点赞，不展示成功 Toast，但按钮状态与推荐信号需同步生效。</div>
+          <div class="note">
+            <strong>5. 分享逻辑：</strong>
+            <div class="note-group">
+              <span class="note-line">1）用户点击分享按钮后，页面展示底部分享弹窗与背景蒙层；支持 `Copy Link`、`Download Video` 两项操作。</span>
+              <span class="note-line">2）`Copy Link` 实际复制的并非单独 URL，而是一整段带深链的分享文案，便于用户直接转发至外部渠道。</span>
+              <span class="note-line">3）接收方点击分享文案中的链接后，若设备已安装 Novi AI App，则优先唤起 App 并回流至对应模板详情/模板内容页；若未安装 App，则可直接跳转 H5 承接页。</span>
+              <span class="note-line">4）H5 分享预览页需默认展示模板视频首帧与播放按钮，顶部仅露出 `Novi AI` 品牌名，底部保留 `NoviAI_Video`、模板标题与 `Create Same →` 主按钮，减少冗余说明文案，聚焦回流转化。</span>
+              <span class="note-line">5）用户在 H5 承接页点击 `Create Same →`：若设备已安装 Novi AI App，则直接唤起 App，并回流至<strong>当前分享对应的单个模板详情页</strong>（与深链模板 ID 一致）；若未安装 App，则直接跳转<strong>应用下载页</strong>（App Store / Google Play）。</span>
+              <span class="note-line">6）用户点击关闭按钮或蒙层外区域时，分享弹窗与背景蒙层需同时消失，不保留残留遮罩。</span>
+            </div>
+            <div class="share-copy-example">示例分享文案：Check out this amazing AI video: https://novi.ai/inspiration/sample-office-bunny Tap the link or copy this message to open it in Novi AI and view the full content.</div>
+            <div class="note-action-row">
+              <button class="note-action-btn" id="openLandingFromDoc">查看分享预览页原型</button>
+            </div>
+          </div>
+          <div class="note"><strong>6. 下载逻辑：</strong>点击下载后分享弹窗消失，保留背景蒙层并展示“下载中”弹窗；下载完成后关闭弹窗，并展示 `Saved to Album` Toast。</div>
+          <div class="note"><strong>7. Create Same：</strong>按钮位于底部主行动区。游客无需登录即可进入功能页，缩短从“被种草”到“尝试生成”的路径。</div>
+          <div class="note"><strong>8. 带参预填：</strong>文生视频模板跳转 `Text to Video` 并带入模型、Prompt、比例、分辨率、时长；图生视频模板跳转 `Image to Video` 并额外带入参考图。</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>五、后台需求</h2>
+        <div class="brief-list">
+          <div class="brief-item">
+            <strong>1. Novi AI-AI中台-素材中台，新增灵感流管理界面</strong>
+            <div class="backend-req">
+              <span class="backend-group">字段：</span>
+              <span class="backend-line">分类：固定归属为“灵感流”，用于区分该内容与其他模板分类。</span>
+              <span class="backend-line">模板类型：支持文生视频 / 图生视频 / Agent视频，用于区分模板内容形态及前台跳转逻辑。</span>
+              <span class="backend-line">名称：用于后台内容识别的名称字段，可作为运营管理、内容检索及配置区分的基础标识。</span>
+              <span class="backend-line">使用次数：记录模板被“Create Same”调用的累计次数，用于衡量模板转化表现。</span>
+              <span class="backend-line">点赞次数：记录模板累计点赞总数，口径为各端点赞数据汇总。</span>
+              <span class="backend-line">平台：支持 iOS / Android / Web 等，用于控制模板在哪些端展示或生效。</span>
+              <span class="backend-line">排序：排序权重字段，数值越大优先级越高，用于控制灵感流内容展示顺序。</span>
+              <span class="backend-line">分享URL：模板视频对应的分享链接，用于复制分享、外部回流及分享预览页承接。</span>
+              <span class="backend-line">状态：启用 / 禁用，用于控制模板是否在灵感流中生效展示。</span>
+              <span class="backend-line">创建时间：记录模板内容创建时间，用于后台管理与内容追踪。</span>
+              <span class="backend-line">更新时间：记录模板配置最近一次修改时间，用于版本追踪与运营核对。</span>
+              <span class="backend-group">操作：</span>
+              <span class="backend-line">编辑：支持修改模板基础信息、展示平台、排序权重、分享URL及状态配置。</span>
+              <span class="backend-line">删除：支持移除对应灵感流模板配置，删除后不再参与前台展示。</span>
+            </div>
+          </div>
+          <div class="brief-item"><strong>2. 分享链路支持：</strong>支持“复制模板视频分享URL + 回流 + 分享预览页”。</div>
+        </div>
+      </div>
+
+    </aside>
+
+    <main class="prototype-wrap">
+      <div class="prototype-stage">
+      <div class="phone-stage">
+      <div class="phone-shell">
+        <div class="phone-screen" id="phoneScreen">
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+              <span>5G</span>
+              <span class="status-pill"></span>
+            </div>
+          </div>
+
+          <section class="feed-screen" id="feedScreen">
+            <div class="feed-background" id="feedBackground">
+              <video class="feed-video" id="feedVideo" muted loop playsinline autoplay></video>
+              <div class="video-fallback" id="feedVideoFallback">
+                <div class="video-fallback-card">
+                  <div class="video-fallback-kicker">Novi AI Inspiration</div>
+                  <div class="video-fallback-title" id="feedFallbackTitle">Template Preview</div>
+                  <div class="video-fallback-desc">Preview video is unavailable in this shared copy. You can still review the layout and interaction flow.</div>
+                </div>
+              </div>
+            </div>
+            <div class="video-tap-layer" id="videoTapLayer" aria-label="Toggle play or pause"></div>
+            <div class="feed-overlay"></div>
+
+            <div class="play-indicator" id="playIndicator">▶</div>
+
+            <div class="feed-side">
+              <div class="icon-stack">
+                <button class="icon-btn" id="likeBtn"><span>♥</span></button>
+                <div class="metric" id="likeCount">0</div>
+              </div>
+              <div class="icon-stack">
+                <button class="icon-btn" id="shareBtn"><span>↗</span></button>
+                <div class="metric" id="shareCount">0</div>
+              </div>
+            </div>
+
+            <div class="feed-bottom">
+              <div class="account-row">
+                <div class="account-copy">
+                  <span class="account-name">NoviAI_Video</span>
+                  <span class="badge">Official</span>
+                </div>
+              </div>
+              <div class="template-title" id="templateTitle"></div>
+              <button class="primary-action" id="createSameBtn">Create Same</button>
+              <div class="video-progress" aria-hidden="true">
+                <div class="video-progress-bar" id="videoProgressBar"></div>
+              </div>
+            </div>
+
+            <div class="bottom-nav">
+              <button class="nav-item" id="inspirationNavHome" type="button">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 3.2 4.2 9.6c-.5.4-.7.9-.7 1.5v8.1c0 .9.7 1.6 1.6 1.6H9c.5 0 .9-.4.9-.9v-4.4c0-.6.5-1 1-1h2.2c.6 0 1 .4 1 1v4.4c0 .5.4.9.9.9h3.9c.9 0 1.6-.7 1.6-1.6V11c0-.6-.3-1.1-.7-1.5L12 3.2Z"/>
+                </svg>
+                <div class="nav-label">Home</div>
+              </button>
+              <div class="nav-item active inspiration">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M7.2 3.8h9.6c.8 0 1.4.6 1.4 1.4v3.4l1.6.9c.5.3.8.8.8 1.4v6.8c0 .8-.6 1.4-1.4 1.4H4.8c-.8 0-1.4-.6-1.4-1.4v-6.8c0-.6.3-1.1.8-1.4l1.6-.9V5.2c0-.8.6-1.4 1.4-1.4Zm1.3 2.5v1.2h7V6.3h-7Zm3.1 4.1v5.1l4.4-2.5-4.4-2.6Z"/>
+                  <rect x="3.4" y="9.7" width="17.2" height="9.3" rx="1.8" fill="currentColor"/>
+                  <path d="M11.2 11.4v5l4.4-2.5-4.4-2.5Z" fill="#22201f"/>
+                </svg>
+                <div class="nav-label">Inspiration</div>
+              </div>
+              <div class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <rect x="4.2" y="6.2" width="15.6" height="11.8" rx="2.4"/>
+                  <path d="M6.8 8.5h10.4c.6 0 1 .4 1 1v1.4H5.8V9.5c0-.6.4-1 1-1Z" fill="#22201f" opacity=".22"/>
+                  <path d="M9.1 4.4h5.8c.5 0 .9.4.9.9v1H8.2v-1c0-.5.4-.9.9-.9Z"/>
+                </svg>
+                <div class="nav-label">Assets</div>
+              </div>
+              <div class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <circle cx="12" cy="8.3" r="3.8"/>
+                  <path d="M4.8 19c0-3.3 3.2-5.6 7.2-5.6s7.2 2.3 7.2 5.6c0 .6-.5 1.1-1.1 1.1H5.9c-.6 0-1.1-.5-1.1-1.1Z"/>
+                </svg>
+                <div class="nav-label">Mine</div>
+              </div>
+            </div>
+
+            <div class="sheet-backdrop" id="shareBackdrop"></div>
+            <div class="sheet" id="shareSheet">
+              <button class="sheet-close-icon" id="closeShare" aria-label="Close share dialog">×</button>
+              <div class="sheet-title">Share This Template</div>
+              <div class="sheet-actions">
+                <button class="sheet-action" data-share-action="copy">
+                  <span>Copy Link</span>
+                </button>
+                <button class="sheet-action" data-share-action="download" id="downloadAction">
+                  <span>Download Video</span>
+                </button>
+              </div>
+            </div>
+            <div class="download-modal" id="downloadModal">
+              <div class="download-progress" id="downloadProgress">
+                <div class="download-progress-row">
+                  <span style="display:flex;align-items:center;gap:8px;">
+                    <span class="download-spinner"></span>
+                    <span>Downloading...</span>
+                  </span>
+                  <span id="downloadPercent">0%</span>
+                </div>
+                <div class="download-progress-track">
+                  <div class="download-progress-bar" id="downloadProgressBar"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="toast" id="toast"></div>
+          </section>
+
+          <section class="generate-screen hidden" id="generateScreen">
+            <button class="back-btn" id="backFromGenerate">&#8592;</button>
+            <div class="screen-title">Generate Clip</div>
+
+            <div class="generate-content">
+              <div class="tabs">
+                <button class="tab" id="imageTab">Image to Video</button>
+                <button class="tab" id="textTab">Text to Video</button>
+              </div>
+
+              <div class="field">
+                <div class="field-label">Model</div>
+                <div class="card model-row">
+                  <span>Selected Model</span>
+                  <span class="model-name" id="modelName">Kling 1.6</span>
+                </div>
+              </div>
+
+              <div class="field hidden" id="referenceField">
+                <div class="field-label">Reference Image</div>
+                <div class="card">
+                  <div class="ref-image"></div>
+                  <div class="template-row">
+                    <span>Template</span>
+                    <span class="template-pill" id="referenceTemplate">Office Bunny</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="field-label">Prompt</div>
+                <div class="card prompt-box" id="promptText">
+                  <span id="promptBody"></span>
+                  <span class="prompt-counter" id="promptCounter">0 / 5000</span>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="field-label">Template</div>
+                <div class="card template-row">
+                  <span>Preset</span>
+                  <span class="template-pill" id="templatePreset">Office Bunny</span>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="field-label">Options</div>
+                <div class="option-row">
+                  <div class="gen-option" id="resolutionOpt">720P</div>
+                  <div class="gen-option" id="durationOpt">5s</div>
+                  <div class="gen-option" id="ratioOpt">1:1</div>
+                </div>
+              </div>
+
+              <button class="generate-btn" id="generateBtn">Generate</button>
+              <div class="generate-note" id="generateNote">Template parameters are prefilled from Inspiration.</div>
+            </div>
+          </section>
+
+          <section class="login-screen hidden" id="loginScreen">
+            <button class="back-btn" id="backFromLogin">&#8592;</button>
+            <div class="login-art">
+              <div class="art-card" style="width: 150px; height: 206px; left: 14px; top: 56px; transform: rotate(-16deg);"></div>
+              <div class="art-card" style="width: 154px; height: 92px; left: 188px; top: 20px; transform: rotate(10deg);"></div>
+              <div class="art-card" style="width: 126px; height: 148px; left: 196px; top: 122px; transform: rotate(12deg);"></div>
+              <div class="art-card" style="width: 158px; height: 102px; left: 38px; top: 264px; transform: rotate(8deg);"></div>
+              <div class="art-card" style="width: 166px; height: 116px; left: 206px; top: 318px; transform: rotate(-12deg);"></div>
+            </div>
+            <div class="login-copy">
+              <div class="login-title">Sign in to like official templates</div>
+              <div class="login-subtitle">Guests can explore and create. Sign in is required when you want to like and help improve future recommendations.</div>
+              <button class="login-btn" id="signInApple">Sign in with Apple</button>
+              <button class="login-btn" id="signInGoogle">Sign in with Google</button>
+              <button class="login-btn secondary" id="createAccount">Create an account</button>
+              <div class="login-footer">By continuing, you agree to the EULA and Disclaimer.</div>
+            </div>
+          </section>
+
+          <section class="landing-screen hidden" id="landingScreen">
+            <div class="landing-content">
+              <div class="landing-header">
+                <button class="landing-header-btn" id="backFromLanding">×</button>
+                <div class="landing-brand">
+                  <div class="landing-brand-name">Novi AI</div>
+                </div>
+                <button class="landing-header-btn more" id="landingMoreBtn">···</button>
+              </div>
+              <div class="landing-stage">
+                <div class="landing-preview" id="landingPreview">
+                  <video id="landingVideo" muted loop playsinline></video>
+                  <div class="landing-video-fallback" id="landingVideoFallback">
+                    <div class="video-fallback-card">
+                      <div class="video-fallback-kicker">Shared Preview</div>
+                      <div class="video-fallback-title" id="landingFallbackTitle">Template Preview</div>
+                      <div class="video-fallback-desc">Video asset is unavailable on this device. The shared preview layout and CTA remain available.</div>
+                    </div>
+                  </div>
+                  <button class="landing-play-btn" id="landingPlayBtn">▶</button>
+                </div>
+                <div class="landing-footer">
+                  <div>
+                    <div class="landing-meta" id="landingMeta">NoviAI_Video</div>
+                    <div class="landing-title" id="landingTitle">Office Bunny</div>
+                  </div>
+                  <div class="landing-cta-row">
+                    <button class="landing-primary-btn" id="landingCreateBtn">Create Same →</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+      <div class="side-swipe-hint">上下切换视频</div>
+      <div class="side-swipe-controls">
+        <button class="nav-btn" id="prevBtn" aria-label="Previous video">&#8593;</button>
+        <button class="nav-btn" id="nextBtn" aria-label="Next video">&#8595;</button>
+      </div>
+      </div>
+      </div>
+      <div class="prototype-side-entry">
+        <button class="prototype-action-btn" id="openLandingSideBtn">查看分享预览页原型</button>
+      </div>
+    </main>
+      </div>
+    </section>
+
+    <section class="root-tab-panel" data-root-tab-panel="review">
+      <div class="review-page">
+        <div class="review-layout">
+          <aside class="review-brief panel">
+            <div class="data-header-copy">
+              <h1>商店评价引导</h1>
+            </div>
+            <div class="review-brief-grid">
+              <div class="review-brief-card">
+                <strong>1. 需求概述</strong>
+                <span>新增商店评分评价引导弹窗，用于在不打断用户核心创作链路的前提下，提升满意用户的应用商店评分转化，并收集低分用户的具体反馈，作为后续产品优化依据。</span>
+              </div>
+              <div class="review-brief-card">
+                <strong>2. 流程说明</strong>
+                <span>1）当用户触发评分引导场景后，页面展示背景蒙层与五星评分弹窗。
+2）若用户点击 `4-5` 星，则不增加额外确认步骤，直接跳转对应应用商店评分页。
+3）若用户点击 `1-3` 星，则不跳转应用商店，直接进入低分反馈问卷弹窗。
+4）若用户完成低分反馈提交，则页面展示感谢反馈 Toast。
+5）若用户点击右上角 `X`，则关闭当前弹窗并结束本次引导。</span>
+              </div>
+              <div class="review-brief-card">
+                <strong>3. 五星评分弹窗触发条件</strong>
+                <span>1）用户首次导出视频成功后触发，仅触发一次。
+2）用户点击个人中心 `Review Us` 入口时触发。</span>
+              </div>
+              <div class="review-brief-card">
+                <strong>4. 交互逻辑</strong>
+                <span>五星评分弹窗：
+1）用户点击 `1-3` 星后，当前评分弹窗关闭，并立即进入低分反馈问卷弹窗。
+2）用户点击 `4-5` 星后，当前弹窗关闭，并直接跳转对应应用商店评分页。
+3）用户点击右上角 `X` 后，关闭评分弹窗，不再继续后续流程。
+
+问卷收集弹窗：
+1）用户可多选不满意原因，选项包括 `Video quality is poor`、`The result didn't match my idea`、`Characters or scenes are wrong`、`Generation is too slow`、`Unsatisfied with the interaction experience`、`Other`。
+2）当用户选择 `Other` 时，可进一步输入补充反馈内容。
+3）`Submit` 按钮默认置灰；当用户至少选择一个原因，或填写 `Other` 文本后，按钮变为可点击。
+4）用户点击 `Submit` 后，关闭问卷弹窗，并展示感谢反馈 Toast：`Thanks for your feedback. We'll keep improving Novi AI for you.`
+5）用户点击右上角 `X` 后，关闭问卷弹窗，不再继续反馈提交流程。</span>
+              </div>
+            </div>
+          </aside>
+
+          <main class="review-prototype-wrap">
+            <div class="prototype-stage">
+              <div class="phone-stage">
+                <div class="phone-shell">
+                  <div class="phone-screen review-phone-screen" id="reviewPhoneScreen">
+                    <div class="status-bar">
+                      <span>9:41</span>
+                      <div class="status-icons">
+                        <span>5G</span>
+                        <span class="status-pill"></span>
+                      </div>
+                    </div>
+
+                    <div class="review-export-stage">
+                      <div class="review-export-card">
+                        <div class="review-export-preview">
+                          <div class="review-export-copy">
+                            <strong>Dreamy Moon Rabbit</strong>
+                            <span>Your video has been exported successfully.</span>
+                          </div>
+                        </div>
+                        <div class="review-success-bar">
+                          <div class="review-success-copy">
+                            <strong>Saved to Album</strong>
+                            <span>Your first exported video is ready to share.</span>
+                          </div>
+                          <span class="review-success-pill">Exported</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="review-overlay"></div>
+
+                    <div class="review-modal" id="ratingModal">
+                      <button class="review-close-btn" id="closeRatingModal">×</button>
+                      <div class="review-modal-title">Enjoying your video?</div>
+                      <div class="review-modal-subtitle">Tap a star to rate your experience.</div>
+                      <div class="review-stars" id="reviewStars">
+                        <button class="review-star" data-score="1">★</button>
+                        <button class="review-star" data-score="2">★</button>
+                        <button class="review-star" data-score="3">★</button>
+                        <button class="review-star" data-score="4">★</button>
+                        <button class="review-star" data-score="5">★</button>
+                      </div>
+                    </div>
+
+                    <div class="review-modal hidden" id="feedbackModal">
+                      <button class="review-close-btn" id="closeFeedbackModal">×</button>
+                      <div class="review-modal-title">We're sorry to hear that</div>
+                      <div class="review-modal-subtitle">What made your experience unsatisfactory? You can select multiple reasons.</div>
+                      <div class="review-options">
+                        <button class="review-option" data-feedback-option="quality">Video quality is poor</button>
+                        <button class="review-option" data-feedback-option="mismatch">The result didn't match my idea</button>
+                        <button class="review-option" data-feedback-option="characters">Characters or scenes are wrong</button>
+                        <button class="review-option" data-feedback-option="speed">Generation is too slow</button>
+                        <button class="review-option" data-feedback-option="interaction">Unsatisfied with the interaction experience</button>
+                        <label class="review-option other-option" data-feedback-option="other">
+                          <span>Other</span>
+                          <input class="review-option-input" id="reviewOtherInlineInput" type="text" placeholder="Write here" />
+                        </label>
+                      </div>
+                      <button class="review-submit-btn" id="submitFeedbackBtn" disabled>Submit</button>
+                    </div>
+
+                    <div class="review-toast" id="reviewToast">Thanks for your feedback. We'll keep improving Novi AI for you.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const templates = [
+      {
+        id: "sample-office-bunny",
+        title: "Office Bunny",
+        type: "image",
+        model: "Seedance 2.0",
+        prompt: "A cute rabbit holds a phone, talking to the camera: \"Jason! Stop rushing me to make videos! I found a new product. Novi AI Video Generator. It is amazing!\" Show subtitles.",
+        ratio: "9:16",
+        resolution: "720P",
+        duration: "10S",
+        likes: 12840,
+        shares: 1870,
+        background: "linear-gradient(180deg, rgba(8,13,28,0.18), rgba(8,13,28,0.05)), radial-gradient(circle at 58% 22%, rgba(255, 210, 153, 0.82), transparent 16%), linear-gradient(145deg, #45342f 0%, #7e6245 45%, #c89c6f 78%, #3b2c24 100%)",
+        templateName: "Office Bunny",
+        video: "样例模板/样例视频模板-视频/2.职场小兔（图生视频）.mp4"
+      },
+      {
+        id: "sample-ace",
+        title: "The Ace of Spades",
+        type: "text",
+        model: "Seedance 2.0",
+        prompt: "God of Gamblers aesthetic: Medium shot France woman at poker table, elegant fingers slowly fanning cards, black Ace peeking, mysterious smile [0-1.5s]; dramatic whip pan to extreme close-up, rapid wrist flick sending Ace flying like bullet, motion blur on hand, card slicing air with speed [1.5-2.5s]; high-speed tracking shot card racing through floor, blurring past roulette wheels, weaving between standing guests, through falling chips, up escalator, into elevator shaft, rapid scene transitions [2.5-6s]; card shooting up spiral staircase, banking off marble railings, through chandelier crystals [6-8s]; burst onto rooftop night skyline, man in black suit back to camera hands in pockets, card streaking toward him, he snaps fingers catching it mid-air without turning, wind blowing coat, city lights behind [8-10s].",
+        ratio: "9:16",
+        resolution: "720P",
+        duration: "10S",
+        likes: 15400,
+        shares: 2420,
+        background: "linear-gradient(180deg, rgba(8,13,28,0.16), rgba(8,13,28,0.08)), radial-gradient(circle at 48% 18%, rgba(255, 84, 59, 0.52), transparent 16%), linear-gradient(145deg, #120b0d 0%, #341514 42%, #8b3627 76%, #1b0f11 100%)",
+        templateName: "The Ace of Spades",
+        video: "样例模板/样例视频模板-视频/4.那张黑桃A（文生视频）.mp4"
+      },
+      {
+        id: "sample-kitten",
+        title: "Banana Kitten's Dream",
+        type: "image",
+        model: "Seedance 2.0",
+        prompt: "Studio Ghibli dreamscape aesthetic: Tiny orange kitten in banana costume standing in enchanted fantasy forest, giant mushrooms glowing soft pink, crystal flowers shimmering, fireflies forming spirals, eyes wide with wonder [0-1s]; waddling through forest, stubby legs moving clumsily, paw tapping glowing jelly mushroom that bounces, giggling expression [1-3s]; chasing butterfly with stained-glass wings, stumbling over crystal root, rolling down soft moss hill, landing in pile of luminescent petals, sneezing adorably [3-5s]; floating down moonlit stream on giant lily pad, starlight reflecting on water, paw swatting at floating sparkles, getting sleepy [5-7s]; curling into ball on cloud that gently descends, wrapping like cocoon [7-9s]; transition to cozy bedroom, sleeping peacefully on soft cushion, gentle breathing, moonlight through window, peaceful smile [9-10s].",
+        ratio: "9:16",
+        resolution: "720P",
+        duration: "10S",
+        likes: 11190,
+        shares: 1680,
+        background: "linear-gradient(180deg, rgba(8,13,28,0.12), rgba(8,13,28,0.06)), radial-gradient(circle at 48% 24%, rgba(97, 190, 255, 0.52), transparent 18%), linear-gradient(145deg, #102638 0%, #2a6b8d 36%, #e6bf96 72%, #533126 100%)",
+        templateName: "Banana Kitten",
+        video: "样例模板/样例视频模板-视频/6.香蕉小猫寻梦记（图生视频）.mp4"
+      },
+      {
+        id: "sample-wkw",
+        title: "Wong Kar-wai Vibe",
+        type: "text",
+        model: "Seedance 2.0",
+        prompt: "Wong Kar-wai aesthetic: Low-angle tracking shot of red high heels walking on wet convenience store floor, rain and neon lights outside the window [0-2s], medium shot of a short, wavy blonde hair cool beauty in beige trench coat and dark sunglasses reaching for a pineapple can on the shelf, green fluorescent light, frame-within-frame composition [2-5s], extreme close-up of rotating pineapple can showing expiration date, neon reflections on sunglasses [5-8s], medium close-up of her turning to camera, whispering \"Everything expires eventually\" [8-10s].",
+        ratio: "9:16",
+        resolution: "720P",
+        duration: "10S",
+        likes: 13160,
+        shares: 1490,
+        background: "linear-gradient(180deg, rgba(8,13,28,0.12), rgba(8,13,28,0.08)), radial-gradient(circle at 54% 18%, rgba(255, 188, 113, 0.62), transparent 16%), linear-gradient(145deg, #372421 0%, #73493b 36%, #d99861 68%, #41506d 100%)",
+        templateName: "Wong Kar-wai Vibe",
+        video: "样例模板/样例视频模板-视频/8.王家卫风格（文生视频）.mp4"
+      },
+      {
+        id: "sample-explosion",
+        title: "Explosions",
+        type: "text",
+        model: "Seedance 2.0",
+        prompt: "Michael Bay explosive aesthetic: Low-angle tracking shot hero sprinting full speed through narrow alley, tactical gear, intense focus, walls blurring past [0-1s]; sudden massive explosion erupts from side building, shockwave blast, hero launching into lateral dive, mid-air twist, shoulder roll landing [1-2s]; continuous momentum hero springing to feet without stopping, sprinting forward, debris and flames chasing heels [2-4s]; hero sliding under overturned car, flames licking overhead, scrambling out other side [4-5s]; wall run kick off vertical surface, grabbing fire escape ladder, swinging up [5-7s]; hero leaping between rooftops, explosion fireball engulfing building behind, silhouetting his jump [7-8s]; landing hard rolling into crouch, looking back at inferno [8-10s].",
+        ratio: "9:16",
+        resolution: "720P",
+        duration: "10S",
+        likes: 18240,
+        shares: 2960,
+        background: "linear-gradient(180deg, rgba(8,13,28,0.15), rgba(8,13,28,0.1)), radial-gradient(circle at 50% 22%, rgba(255, 124, 48, 0.74), transparent 18%), linear-gradient(145deg, #16100f 0%, #583122 42%, #d76328 74%, #261b17 100%)",
+        templateName: "Explosions",
+        video: "样例模板/样例视频模板-视频/10.爆炸美学（文生视频）.mp4"
+      },
+      {
+        id: "sample-ballet",
+        title: "Underwater Ballet Dream",
+        type: "text",
+        model: "Seedance 2.0",
+        prompt: "Ethereal underwater ballet aesthetic: Wide shot lone ballerina standing on submerged rock ledge, white flowing dress billowing around her, bioluminescent cave glowing soft blue-green [0-1s]; graceful plié into water, fabric exploding outward like flower blooming, bubbles trailing upward [1-2s]; tracking shot following her descent, arms extending into first position, pointed toes, hair fanning out like dark halo [2-3s]; slow pirouette with bioluminescent particles swirling in her wake [3-5s]; arabesque pose held suspended [5-7s]; grand jeté gliding through water [7-8s]; final upside-down floating pose with 360 orbit shot [8-10s].",
+        ratio: "9:16",
+        resolution: "720P",
+        duration: "10S",
+        likes: 14550,
+        shares: 1730,
+        background: "linear-gradient(180deg, rgba(8,13,28,0.14), rgba(8,13,28,0.08)), radial-gradient(circle at 46% 20%, rgba(119, 244, 255, 0.42), transparent 18%), linear-gradient(145deg, #071c27 0%, #0b4d63 36%, #5778d6 64%, #1c1436 100%)",
+        templateName: "Underwater Ballet",
+        video: "样例模板/样例视频模板-视频/12.水下芭蕾幻梦（文生视频）.mp4"
+      },
+      {
+        id: "sample-vaporwave",
+        title: "Vaporwave Retro Future",
+        type: "text",
+        model: "Seedance 2.0",
+        prompt: "Vaporwave surreal aesthetic: Opening on chrome palm trees reflecting pink sunset, camera pushing through glitching VHS static into scene [0-1s]; ancient Greek bust wearing 3D glasses and gold chain floating upside down [1-2s]; Windows 95 error windows floating like clouds [2-3s]; purple velvet dolphin leaping through grid floor leaving rainbow trail [3-5s]; Roman columns, steam vents, floating cassette road, retro sports car, chrome pyramid and MTV logo in a maximalist glitch dream [5-10s].",
+        ratio: "9:16",
+        resolution: "720P",
+        duration: "10S",
+        likes: 13780,
+        shares: 1540,
+        background: "linear-gradient(180deg, rgba(8,13,28,0.16), rgba(8,13,28,0.08)), radial-gradient(circle at 56% 22%, rgba(255, 132, 208, 0.48), transparent 18%), linear-gradient(145deg, #261741 0%, #6e2a84 42%, #ff7b9a 72%, #2f6ac0 100%)",
+        templateName: "Vaporwave Retro",
+        video: "样例模板/样例视频模板-视频/14.蒸汽波复古未来（文生视频）.mp4"
+      }
+    ];
+
+    const requirementsTableConfig = {
+      tableClass: "data-table--requirements",
+      headers: ["需求编号", "产品名称", "标题", "描述", "负责人", "功能模块", "需求终端", "业务价值/目标", "优先级", "关联迭代版本"],
+      columnClasses: ["col-index", "col-product", "col-title", "col-description", "col-owner", "col-module-name", "col-terminal", "col-goal", "col-priority", "col-version"],
+      rows: [
+        ["1", "Novi AI", "首页推荐视频改版，新增 Trending / Clip 双 Tab 推荐模板", "首页推荐作为快速决策入口，推荐区由旧长视频老模板展示改为 Trending 热门趋势视频及 Clip 短视频双 Tab 展示。\n首页卡片采用双列弱瀑布流，支持 3:4 / 4:3 固定比例交错展示；点击卡片进入单条模板预览页，自动播放真实模板视频，并支持点赞、分享、Create Same，形成“快速选模板→预览→创建同款”的转化链路。", "陈怡君", "首页推荐", "Android&iOS", "提升首页模板点击率、模板预览进入率与 Create Same 转化率，帮助用户更快完成模板选择并导流进入创作。", "中", "Novi AI Android & iOS V2.3.5"],
+        ["2", "Novi AI", "Clips Tab改为灵感流Inspiration，短视频播放交互展示模板视频", "打造内容种草→转化路径。适应移动端病毒式传播交互，打造灵感流功能。\n全屏沉浸式浏览，支持上下切换刷新模板视频；点赞；分享；创建同款；", "陈怡君", "灵感广场", "Android&iOS", "提升内容消费时长与用户创作动机，通过“先种草再创作”路径，提高生成转化率与付费转化率", "中", "Novi AI Android & iOS V2.3.5"],
+        ["3", "Novi AI", "新增商店评分评价引导弹窗", "1.在用户完成核心行为后，弹出轻量友好的评分引导弹窗，引导用户前往应用商店进行评分与文字评价。\n2.个人中心Review Us入口优化，改为商店评分引导弹窗。", "陈怡君", "个人中心", "Android&iOS", "提升应用商店评分与口碑", "中", "Novi AI Android & iOS V2.3.5"]
+      ]
+    };
+
+    const trackingTableConfig = {
+      tableClass: "data-table--tracking",
+      headers: ["模块", "事件名称", "事件ID", "事件参数", "参数值", "备注"],
+      columnClasses: ["col-module", "col-event", "col-id", "col-param", "col-value", "col-remark"],
+      rows: [
+        ["Inspiration灵感广场\n创建同款转化率：Create Same点击UV / Inspiration曝光UV\n\n模板生成转化率：Generate点击UV / Create Same点击UV", "页面曝光", "inspiration_feed_exposure", "template_id,template_name,template_type,position,platform", "当前曝光模板ID,模板名称,文生/图生/Agent视频,曝光位置,平台", "用户进入Inspiration后首条曝光及上下滑切换后的每条曝光均上报"],
+        ["", "Inspiration页Create Same点击", "inspiration_create_same_click", "template_id,template_name,template_type,target_page,platform", "模板ID,模板名称,模板类型,Text to Video/Image to Video/Agent,平台", "用户在Inspiration页点击Create Same按钮时上报"],
+        ["", "进入生成功能页", "inspiration_enter_generate_page", "template_id,template_name,template_type,target_page,platform", "模板ID,模板名称,模板类型,目标页,平台", "由模板内容进入对应生成功能页成功落地时上报"],
+        ["分享点击率：分享点击UV / Inspiration曝光UV", "分享按钮点击", "inspiration_share_click", "template_id,template_name,platform", "模板ID,模板名称,平台", "用户点击右侧分享按钮时上报"],
+        ["点赞率：点赞点击UV / Inspiration曝光UV", "点赞点击", "inspiration_like_click", "template_id,template_name,like_status,platform", "模板ID,模板名称,点赞/取消点赞,平台", "登录用户点赞/取消点赞均上报；"],
+        ["分享弹窗", "复制链接点击", "inspiration_share_copy_click", "template_id,template_name,share_url,platform", "模板ID,模板名称,模板分享URL,平台", "用户点击Copy Link按钮时上报"],
+        ["", "下载视频点击", "inspiration_share_download_click", "template_id,template_name,platform", "模板ID,模板名称,平台", "用户点击Download Video按钮时上报"],
+        ["", "下载视频成功", "inspiration_share_download_success", "template_id,template_name,platform", "模板ID,模板名称,平台", "视频下载完成并展示Saved to Album后上报"],
+        ["商店评分评价引导弹窗", "评分弹窗曝光", "store_review_modal_exposure", "trigger_source,platform", "首次导出成功/Review Us入口,平台", "评分引导弹窗展示时上报"],
+        ["", "点击1-3星", "store_review_low_score_click", "score,trigger_source,platform", "1/2/3星,触发来源,平台", "用户点击1-3星并进入问卷弹窗时上报"],
+        ["", "点击4-5星", "store_review_high_score_click", "score,trigger_source,platform", "4/5星,触发来源,平台", "用户点击4-5星并准备跳转应用商店评分页时上报"],
+        ["", "点击关闭按钮", "store_review_close_click", "modal_type,trigger_source,platform", "评分弹窗/问卷弹窗,触发来源,平台", "用户点击右上角X关闭当前弹窗时上报"],
+        ["低分反馈问卷", "问卷弹窗曝光", "store_review_feedback_modal_exposure", "trigger_source,platform", "触发来源,平台", "低分反馈问卷展示时上报"],
+        ["", "问卷选项点击", "store_review_feedback_option_click", "feedback_option,trigger_source,platform", "video_quality_poor/result_not_match_idea/character_or_scene_wrong/generation_speed/interaction_experience/other,触发来源,平台", "用户勾选或取消勾选低分原因项时上报"],
+        ["", "Other文本输入", "store_review_feedback_other_input", "input_text,trigger_source,platform", "输入内容,触发来源,平台", "用户在Other输入框填写内容时上报输入内容"],
+        ["", "问卷提交点击", "store_review_feedback_submit_click", "selected_options,has_other_text,trigger_source,platform", "已选原因项,是否填写Other文本,触发来源,平台", "用户点击Submit按钮时上报"],
+        ["", "问卷提交成功", "store_review_feedback_submit_success", "selected_options,has_other_text,trigger_source,platform", "已选原因项,是否填写Other文本,触发来源,平台", "问卷提交成功并展示感谢反馈Toast时上报"],
+        ["商店跳转", "跳转应用商店评分页", "store_review_jump_to_store", "score,store_type,trigger_source,platform", "评分星级,App Store/Google Play,触发来源,平台", "高分用户从评分弹窗跳转至应用商店评分页时上报"],
+        ["首页推荐改版\n卡片点击率：卡片点击UV / 首页推荐曝光UV\n\n创建同款转化率：Create Same点击UV / 模板预览UV", "页面曝光", "home_recommendation_exposure", "tab_name,template_id,template_name,template_type,card_ratio,position,platform", "Trending/Clip,当前曝光模板ID,模板名称,文生/图生,3:4/4:3,曝光位置,平台", "用户进入首页推荐后首屏曝光及切换 Tab / 下滑加载后的卡片曝光均上报"],
+        ["", "Tab点击", "home_recommendation_tab_click", "tab_name,platform", "Trending/Clip,平台", "用户点击 Trending 或 Clip Tab 切换推荐池时上报"],
+        ["", "模板卡片点击", "home_recommendation_card_click", "tab_name,template_id,template_name,template_type,card_ratio,position,platform", "Trending/Clip,模板ID,模板名称,文生/图生,3:4/4:3,卡片位置,平台", "用户点击首页推荐模板卡片进入预览页时上报"],
+        ["", "模板预览页曝光", "home_recommendation_preview_exposure", "tab_name,template_id,template_name,template_type,platform", "Trending/Clip,模板ID,模板名称,文生/图生,平台", "用户进入首页推荐单条模板预览页成功落地时上报"],
+        ["", "预览页点赞点击", "home_recommendation_like_click", "tab_name,template_id,template_name,like_status,platform", "Trending/Clip,模板ID,模板名称,点赞/取消点赞,平台", "用户在首页推荐模板预览页点击点赞按钮时上报"],
+        ["", "预览页分享点击", "home_recommendation_share_click", "tab_name,template_id,template_name,platform", "Trending/Clip,模板ID,模板名称,平台", "用户在首页推荐模板预览页点击分享按钮时上报"],
+        ["", "预览页Create Same点击", "home_recommendation_create_same_click", "tab_name,template_id,template_name,template_type,target_page,platform", "Trending/Clip,模板ID,模板名称,文生/图生,Text to Video/Image to Video,平台", "用户在首页推荐模板预览页点击 Create Same 按钮时上报"],
+        ["", "进入生成功能页", "home_recommendation_enter_generate_page", "tab_name,template_id,template_name,template_type,target_page,platform", "Trending/Clip,模板ID,模板名称,文生/图生,目标页,平台", "由首页推荐模板内容进入对应生成功能页成功落地时上报"]
+      ]
+    };
+
+    const homeRedesignItems = {
+      trending: [
+        {
+          video: "样例模板/样例视频模板-视频/New folder/7.虚拟美女Vlog.mp4",
+          moduleName: "Trending",
+          title: "Virtual Beauty Vlog",
+          meta: "Popular now",
+          cardClass: "",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.14), rgba(8,13,28,0.08)), radial-gradient(circle at 48% 18%, rgba(255, 84, 59, 0.52), transparent 16%), linear-gradient(145deg, #120b0d 0%, #341514 42%, #8b3627 76%, #1b0f11 100%)",
+          likes: 18420,
+          shares: 3210,
+          type: "text",
+          model: "Seedance 2.0",
+          prompt: "A virtual beauty creator records a confident lifestyle vlog with cinematic close-ups, glossy lighting and expressive eye contact.",
+          ratio: "9:16",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Virtual Beauty Vlog"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/New folder/10.巨兽对决.mp4",
+          moduleName: "Trending",
+          title: "Beast Duel",
+          meta: "Top engagement",
+          cardClass: "ratio-4-3",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.14), rgba(8,13,28,0.08)), radial-gradient(circle at 60% 20%, rgba(123, 159, 255, 0.5), transparent 16%), linear-gradient(145deg, #10172c 0%, #283f7d 48%, #995cff 100%)",
+          likes: 16380,
+          shares: 2740,
+          type: "text",
+          model: "Seedance 2.0",
+          prompt: "Two giant fantasy beasts collide in a dramatic cinematic confrontation with high impact movement and glowing debris.",
+          ratio: "16:9",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Beast Duel"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/New folder/12.猫公主拒婚.mp4",
+          moduleName: "Trending",
+          title: "Cat Princess Refuses Marriage",
+          meta: "Hot conversion",
+          cardClass: "ratio-4-3",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.14), rgba(8,13,28,0.08)), radial-gradient(circle at 58% 22%, rgba(255, 210, 153, 0.82), transparent 16%), linear-gradient(145deg, #45342f 0%, #7e6245 45%, #c89c6f 78%, #3b2c24 100%)",
+          likes: 15620,
+          shares: 2410,
+          type: "image",
+          model: "Seedance 2.0",
+          prompt: "A royal cat princess dramatically refuses an arranged marriage in a whimsical fantasy palace scene.",
+          ratio: "9:16",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Cat Princess"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/New folder/9.婚礼前夜对峙 .mp4",
+          moduleName: "Trending",
+          title: "Wedding Eve Showdown",
+          meta: "Editor pick",
+          cardClass: "",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.14), rgba(8,13,28,0.08)), radial-gradient(circle at 46% 20%, rgba(119, 244, 255, 0.42), transparent 18%), linear-gradient(145deg, #071c27 0%, #0b4d63 36%, #5778d6 64%, #1c1436 100%)",
+          likes: 14930,
+          shares: 2280,
+          type: "text",
+          model: "Seedance 2.0",
+          prompt: "A tense emotional confrontation unfolds on the eve of a wedding with cinematic framing and dramatic lighting.",
+          ratio: "16:9",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Wedding Eve Showdown"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/New folder/1.水果恋综危机.mp4",
+          moduleName: "Trending",
+          title: "Fruit Dating Crisis",
+          meta: "Trending storyline",
+          cardClass: "ratio-4-3",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.14), rgba(8,13,28,0.08)), radial-gradient(circle at 42% 18%, rgba(255, 136, 110, 0.5), transparent 16%), linear-gradient(145deg, #2d1718 0%, #70312b 46%, #f18c67 100%)",
+          likes: 14160,
+          shares: 2060,
+          type: "text",
+          model: "Seedance 2.0",
+          prompt: "A playful reality-show style romance crisis unfolds among anthropomorphic fruit characters.",
+          ratio: "16:9",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Fruit Dating Crisis"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/New folder/11.别摸店员猫.mp4",
+          moduleName: "Trending",
+          title: "Don't Touch the Shop Cat",
+          meta: "Popular pet theme",
+          cardClass: "",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.14), rgba(8,13,28,0.08)), radial-gradient(circle at 56% 18%, rgba(255, 222, 150, 0.46), transparent 16%), linear-gradient(145deg, #34241b 0%, #6b5238 48%, #d8a86d 100%)",
+          likes: 13620,
+          shares: 1880,
+          type: "image",
+          model: "Seedance 2.0",
+          prompt: "A grumpy but adorable store cat protects its territory while customers try to pet it.",
+          ratio: "9:16",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Shop Cat"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/10.爆炸美学（文生视频）.mp4",
+          moduleName: "Trending",
+          title: "Explosion Aesthetics",
+          meta: "High retention",
+          cardClass: "ratio-4-3",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.14), rgba(8,13,28,0.08)), radial-gradient(circle at 54% 20%, rgba(255, 126, 92, 0.54), transparent 18%), linear-gradient(145deg, #2a1413 0%, #6b2b24 46%, #ef6d4f 100%)",
+          likes: 13240,
+          shares: 1760,
+          type: "text",
+          model: "Seedance 2.0",
+          prompt: "Stylized cinematic explosion sequence with dramatic lighting and intense camera movement.",
+          ratio: "16:9",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Explosion Aesthetics"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/12.水下芭蕾幻梦（文生视频）.mp4",
+          moduleName: "Trending",
+          title: "Underwater Ballet Dream",
+          meta: "Creator favorite",
+          cardClass: "",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.14), rgba(8,13,28,0.08)), radial-gradient(circle at 48% 18%, rgba(103, 219, 255, 0.42), transparent 16%), linear-gradient(145deg, #102030 0%, #1a4663 46%, #5ab6db 100%)",
+          likes: 12790,
+          shares: 1640,
+          type: "text",
+          model: "Seedance 2.0",
+          prompt: "A dancer performs graceful ballet moves underwater with dreamy light rays and floating fabric.",
+          ratio: "9:16",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Underwater Ballet Dream"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/8.王家卫风格（文生视频）.mp4",
+          moduleName: "Trending",
+          title: "Neo Noir Romance",
+          meta: "Top style pick",
+          cardClass: "",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.14), rgba(8,13,28,0.08)), radial-gradient(circle at 52% 18%, rgba(255, 154, 96, 0.4), transparent 16%), linear-gradient(145deg, #1a1222 0%, #3f2049 46%, #9f4a66 100%)",
+          likes: 12160,
+          shares: 1510,
+          type: "text",
+          model: "Seedance 2.0",
+          prompt: "A moody romantic scene in neon city streets, with cinematic blur and nostalgic color grading.",
+          ratio: "9:16",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Neo Noir Romance"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/14.蒸汽波复古未来（文生视频）.mp4",
+          moduleName: "Trending",
+          title: "Vaporwave Future",
+          meta: "Hot aesthetics",
+          cardClass: "ratio-4-3",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.14), rgba(8,13,28,0.08)), radial-gradient(circle at 50% 18%, rgba(255, 132, 231, 0.44), transparent 16%), linear-gradient(145deg, #20193a 0%, #553a89 42%, #2f8dc5 76%, #f37bb0 100%)",
+          likes: 11680,
+          shares: 1440,
+          type: "text",
+          model: "Seedance 2.0",
+          prompt: "Retro-futuristic vaporwave skyline with glowing grids, synth lights and stylized camera pans.",
+          ratio: "16:9",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Vaporwave Future"
+        }
+      ],
+      clips: [
+        {
+          video: "样例模板/样例视频模板-视频/New folder/2.惊喜开箱.mp4",
+          moduleName: "Clips",
+          title: "Surprise Unboxing",
+          meta: "Fresh drop",
+          cardClass: "",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.16), rgba(8,13,28,0.08)), radial-gradient(circle at 56% 22%, rgba(255, 132, 208, 0.48), transparent 18%), linear-gradient(145deg, #261741 0%, #6e2a84 42%, #ff7b9a 72%, #2f6ac0 100%)",
+          likes: 9280,
+          shares: 980,
+          type: "image",
+          model: "Seedance 2.0",
+          prompt: "A surprise unboxing reveal with cute reactions and glossy product close-ups.",
+          ratio: "9:16",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Surprise Unboxing"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/New folder/5.萌宠电台.mp4",
+          moduleName: "Clips",
+          title: "Pet Radio",
+          meta: "New template",
+          cardClass: "ratio-4-3",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.16), rgba(8,13,28,0.08)), radial-gradient(circle at 50% 22%, rgba(126, 242, 223, 0.36), transparent 16%), linear-gradient(145deg, #102028 0%, #1a4c54 46%, #7de4d4 100%)",
+          likes: 7640,
+          shares: 620,
+          type: "text",
+          model: "Seedance 2.0",
+          prompt: "A cute pet hosts a fun late-night radio show with playful expressions and cozy atmosphere.",
+          ratio: "16:9",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Pet Radio"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/New folder/3.微观花园.mp4",
+          moduleName: "Clips",
+          title: "Micro Garden",
+          meta: "Fresh arrival",
+          cardClass: "ratio-4-3",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.16), rgba(8,13,28,0.08)), radial-gradient(circle at 44% 20%, rgba(255, 193, 156, 0.42), transparent 17%), linear-gradient(145deg, #30213c 0%, #6e436c 45%, #efaa8b 100%)",
+          likes: 7010,
+          shares: 570,
+          type: "image",
+          model: "Seedance 2.0",
+          prompt: "A dreamy micro garden world with tiny flowers, magical insects and delicate macro camera motion.",
+          ratio: "9:16",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Micro Garden"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/New folder/4.四季流转.mp4",
+          moduleName: "Clips",
+          title: "Seasons Shift",
+          meta: "Latest upload",
+          cardClass: "",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.16), rgba(8,13,28,0.08)), radial-gradient(circle at 52% 20%, rgba(102, 202, 255, 0.4), transparent 17%), linear-gradient(145deg, #0d1622 0%, #1f4068 44%, #44a8d7 100%)",
+          likes: 6880,
+          shares: 530,
+          type: "text",
+          model: "Seedance 2.0",
+          prompt: "A single scene transforms through spring, summer, autumn and winter with elegant cinematic transitions.",
+          ratio: "9:16",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Seasons Shift"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/New folder/8.猫咪美食评论.mp4",
+          moduleName: "Clips",
+          title: "Cat Food Review",
+          meta: "Fresh upload",
+          cardClass: "",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.16), rgba(8,13,28,0.08)), radial-gradient(circle at 46% 18%, rgba(255, 176, 118, 0.46), transparent 17%), linear-gradient(145deg, #332319 0%, #6d4731 46%, #f0b56f 100%)",
+          likes: 6520,
+          shares: 490,
+          type: "image",
+          model: "Seedance 2.0",
+          prompt: "A food critic cat gives expressive, funny commentary while tasting stylish gourmet dishes.",
+          ratio: "9:16",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Cat Food Review"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/New folder/6.湖畔异甲觉醒.mp4",
+          moduleName: "Clips",
+          title: "Lakeside Armor Awakening",
+          meta: "New fantasy clip",
+          cardClass: "ratio-4-3",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.16), rgba(8,13,28,0.08)), radial-gradient(circle at 54% 16%, rgba(117, 227, 255, 0.42), transparent 17%), linear-gradient(145deg, #10212a 0%, #25536b 48%, #81c4d9 100%)",
+          likes: 6240,
+          shares: 470,
+          type: "text",
+          model: "Seedance 2.0",
+          prompt: "An ancient armored being awakens beside a misty lake in a fantasy cinematic sequence.",
+          ratio: "16:9",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Armor Awakening"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/2.职场小兔（图生视频）.mp4",
+          moduleName: "Clips",
+          title: "Office Bunny",
+          meta: "New character clip",
+          cardClass: "",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.16), rgba(8,13,28,0.08)), radial-gradient(circle at 52% 18%, rgba(255, 148, 148, 0.42), transparent 17%), linear-gradient(145deg, #25161d 0%, #5a2e3f 46%, #d68592 100%)",
+          likes: 5980,
+          shares: 420,
+          type: "image",
+          model: "Seedance 2.0",
+          prompt: "An office bunny character in cinematic workplace scenes with expressive close-ups and playful pacing.",
+          ratio: "9:16",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Office Bunny"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/4.那张黑桃A（文生视频）.mp4",
+          moduleName: "Clips",
+          title: "Ace of Spades",
+          meta: "Latest drama clip",
+          cardClass: "ratio-4-3",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.16), rgba(8,13,28,0.08)), radial-gradient(circle at 56% 16%, rgba(134, 169, 255, 0.44), transparent 17%), linear-gradient(145deg, #111b2e 0%, #2b3f69 46%, #6b86c9 100%)",
+          likes: 5740,
+          shares: 390,
+          type: "text",
+          model: "Seedance 2.0",
+          prompt: "A dramatic high-stakes reveal around an ace of spades with suspenseful pacing and noir lighting.",
+          ratio: "16:9",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Ace of Spades"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/6.香蕉小猫寻梦记（图生视频）.mp4",
+          moduleName: "Clips",
+          title: "Banana Cat Dream Quest",
+          meta: "Fresh cute trend",
+          cardClass: "",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.16), rgba(8,13,28,0.08)), radial-gradient(circle at 50% 18%, rgba(255, 207, 107, 0.48), transparent 17%), linear-gradient(145deg, #2f2518 0%, #70583a 46%, #f3c56b 100%)",
+          likes: 5520,
+          shares: 360,
+          type: "image",
+          model: "Seedance 2.0",
+          prompt: "A whimsical banana cat embarks on a dreamy adventure through playful fantasy environments.",
+          ratio: "9:16",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Banana Cat Dream Quest"
+        },
+        {
+          video: "样例模板/样例视频模板-视频/14.蒸汽波复古未来（文生视频）.mp4",
+          moduleName: "Clips",
+          title: "Retro Future Loop",
+          meta: "New visual style",
+          cardClass: "ratio-4-3",
+          background: "linear-gradient(180deg, rgba(8,13,28,0.16), rgba(8,13,28,0.08)), radial-gradient(circle at 47% 17%, rgba(195, 140, 255, 0.42), transparent 17%), linear-gradient(145deg, #20163a 0%, #4f3582 42%, #46a1d8 76%, #f48ec0 100%)",
+          likes: 5280,
+          shares: 340,
+          type: "text",
+          model: "Seedance 2.0",
+          prompt: "A looping vaporwave city montage blending retro synth vibes with futuristic motion design.",
+          ratio: "16:9",
+          resolution: "720P",
+          duration: "10S",
+          templateName: "Retro Future Loop"
+        }
+      ]
+    };
+
+    let currentIndex = 0;
+    let guestMode = true;
+    let currentScreen = "feed";
+    let activeRootTab = "requirements";
+    let selectedReviewScore = 0;
+    let shareVisible = false;
+    let downloadVisible = false;
+    let isPlaying = true;
+    let downloadTimer = null;
+    let activeHomeModule = "trending";
+    let selectedHomePreviewItem = homeRedesignItems.trending[0];
+    let generateReturnTarget = "feed";
+
+    const feedScreen = document.getElementById("feedScreen");
+    const generateScreen = document.getElementById("generateScreen");
+    const loginScreen = document.getElementById("loginScreen");
+    const landingScreen = document.getElementById("landingScreen");
+    const feedBackground = document.getElementById("feedBackground");
+    const feedVideo = document.getElementById("feedVideo");
+    const landingVideo = document.getElementById("landingVideo");
+    const feedVideoFallback = document.getElementById("feedVideoFallback");
+    const landingVideoFallback = document.getElementById("landingVideoFallback");
+    const feedFallbackTitle = document.getElementById("feedFallbackTitle");
+    const landingFallbackTitle = document.getElementById("landingFallbackTitle");
+    const videoTapLayer = document.getElementById("videoTapLayer");
+    const playIndicator = document.getElementById("playIndicator");
+    const videoProgressBar = document.getElementById("videoProgressBar");
+    const templateTitle = document.getElementById("templateTitle");
+    const likeCount = document.getElementById("likeCount");
+    const shareCount = document.getElementById("shareCount");
+    const likeBtn = document.getElementById("likeBtn");
+    const shareBtn = document.getElementById("shareBtn");
+    const createSameBtn = document.getElementById("createSameBtn");
+    const shareBackdrop = document.getElementById("shareBackdrop");
+    const shareSheet = document.getElementById("shareSheet");
+    const downloadModal = document.getElementById("downloadModal");
+    const closeShare = document.getElementById("closeShare");
+    const downloadAction = document.getElementById("downloadAction");
+    const downloadProgress = document.getElementById("downloadProgress");
+    const downloadPercent = document.getElementById("downloadPercent");
+    const downloadProgressBar = document.getElementById("downloadProgressBar");
+    const toast = document.getElementById("toast");
+    const openLandingFromDoc = document.getElementById("openLandingFromDoc");
+    const openLandingSideBtn = document.getElementById("openLandingSideBtn");
+    const rootTabButtons = document.querySelectorAll("[data-root-tab-btn]");
+    const rootTabPanels = document.querySelectorAll("[data-root-tab-panel]");
+    const inspirationNavHome = document.getElementById("inspirationNavHome");
+    const homeModuleTabs = document.querySelectorAll("[data-home-module-tab]");
+    const ratingModal = document.getElementById("ratingModal");
+    const feedbackModal = document.getElementById("feedbackModal");
+    const reviewToast = document.getElementById("reviewToast");
+    const reviewStars = document.querySelectorAll("[data-score]");
+    const closeRatingModal = document.getElementById("closeRatingModal");
+    const closeFeedbackModal = document.getElementById("closeFeedbackModal");
+    const reviewOptions = document.querySelectorAll("[data-feedback-option]");
+    const reviewOtherInput = document.getElementById("reviewOtherInlineInput");
+    const submitFeedbackBtn = document.getElementById("submitFeedbackBtn");
+    const phoneScreen = document.getElementById("phoneScreen");
+    const landingTitle = document.getElementById("landingTitle");
+    const landingMeta = document.getElementById("landingMeta");
+    const landingPlayBtn = document.getElementById("landingPlayBtn");
+    const backFromLanding = document.getElementById("backFromLanding");
+    const landingCreateBtn = document.getElementById("landingCreateBtn");
+
+    const imageTab = document.getElementById("imageTab");
+    const textTab = document.getElementById("textTab");
+    const referenceField = document.getElementById("referenceField");
+    const modelName = document.getElementById("modelName");
+    const promptText = document.getElementById("promptText");
+    const promptBody = document.getElementById("promptBody");
+    const promptCounter = document.getElementById("promptCounter");
+    const templatePreset = document.getElementById("templatePreset");
+    const referenceTemplate = document.getElementById("referenceTemplate");
+    const resolutionOpt = document.getElementById("resolutionOpt");
+    const durationOpt = document.getElementById("durationOpt");
+    const ratioOpt = document.getElementById("ratioOpt");
+    const generateNote = document.getElementById("generateNote");
+    const homeHubScreen = document.getElementById("homeHubScreen");
+    const homePreviewScreen = document.getElementById("homePreviewScreen");
+    const homeGenerateScreen = document.getElementById("homeGenerateScreen");
+    const homeWaterfallGrid = document.getElementById("homeWaterfallGrid");
+    const homePreviewBackBtn = document.getElementById("homePreviewBackBtn");
+    const homePreviewHero = document.getElementById("homePreviewHero");
+    const homePreviewVideo = document.getElementById("homePreviewVideo");
+    const homePreviewVideoFallback = document.getElementById("homePreviewVideoFallback");
+    const homePreviewFallbackTitle = document.getElementById("homePreviewFallbackTitle");
+    const homePreviewModuleLabel = document.getElementById("homePreviewModuleLabel");
+    const homePreviewTitle = document.getElementById("homePreviewTitle");
+    const homePreviewSubtitle = document.getElementById("homePreviewSubtitle");
+    const homePreviewLikeBtn = document.getElementById("homePreviewLikeBtn");
+    const homePreviewLikeCount = document.getElementById("homePreviewLikeCount");
+    const homePreviewShareBtn = document.getElementById("homePreviewShareBtn");
+    const homePreviewShareCount = document.getElementById("homePreviewShareCount");
+    const homePreviewCreateBtn = document.getElementById("homePreviewCreateBtn");
+    const homePreviewShareBackdrop = document.getElementById("homePreviewShareBackdrop");
+    const homePreviewShareSheet = document.getElementById("homePreviewShareSheet");
+    const homePreviewCloseShareBtn = document.getElementById("homePreviewCloseShareBtn");
+    const homePreviewCopyBtn = document.getElementById("homePreviewCopyBtn");
+    const homePreviewDownloadBtn = document.getElementById("homePreviewDownloadBtn");
+    const homePreviewToast = document.getElementById("homePreviewToast");
+    const homePreviewPlayBtn = document.getElementById("homePreviewPlayBtn");
+    const homePreviewProgressBar = document.getElementById("homePreviewProgressBar");
+    const homeBackFromGenerate = document.getElementById("homeBackFromGenerate");
+    const homeRedesignNavHome = document.getElementById("homeRedesignNavHome");
+    const homeRedesignNavInspiration = document.getElementById("homeRedesignNavInspiration");
+    const homePreviewNavHome = document.getElementById("homePreviewNavHome");
+    const homePreviewNavInspiration = document.getElementById("homePreviewNavInspiration");
+    const homeImageTab = document.getElementById("homeImageTab");
+    const homeTextTab = document.getElementById("homeTextTab");
+    const homeReferenceField = document.getElementById("homeReferenceField");
+    const homeModelName = document.getElementById("homeModelName");
+    const homeReferenceTemplate = document.getElementById("homeReferenceTemplate");
+    const homePromptBody = document.getElementById("homePromptBody");
+    const homePromptCounter = document.getElementById("homePromptCounter");
+    const homeTemplatePreset = document.getElementById("homeTemplatePreset");
+    const homeResolutionOpt = document.getElementById("homeResolutionOpt");
+    const homeDurationOpt = document.getElementById("homeDurationOpt");
+    const homeRatioOpt = document.getElementById("homeRatioOpt");
+    const homeGenerateBtn = document.getElementById("homeGenerateBtn");
+    const homeGenerateNote = document.getElementById("homeGenerateNote");
+
+    function formatCount(value) {
+      return value >= 1000 ? (value / 1000).toFixed(value >= 10000 ? 1 : 0) + "k" : String(value);
+    }
+
+    function showHomePreviewToast(message, duration = 3000) {
+      homePreviewToast.textContent = message;
+      homePreviewToast.classList.add("visible");
+      clearTimeout(showHomePreviewToast.timer);
+      showHomePreviewToast.timer = setTimeout(() => {
+        homePreviewToast.classList.remove("visible");
+      }, duration);
+    }
+
+    function openGenerateFromHomeItem(item) {
+      const isImage = item.type === "image";
+      homeImageTab.classList.toggle("active", isImage);
+      homeTextTab.classList.toggle("active", !isImage);
+      homeReferenceField.classList.toggle("hidden", !isImage);
+      homeModelName.textContent = item.model;
+      homeTemplatePreset.textContent = item.templateName;
+      homeReferenceTemplate.textContent = item.templateName;
+      homeResolutionOpt.textContent = item.resolution;
+      homeDurationOpt.textContent = item.duration;
+      homeRatioOpt.textContent = item.ratio;
+      homePromptBody.textContent = item.prompt;
+      homePromptCounter.textContent = item.prompt.length + " / 5000";
+      homeGenerateNote.textContent = isImage
+        ? "Reference image and generation parameters are prefilled from Home Recommendation."
+        : "Prompt and generation parameters are prefilled from Home Recommendation.";
+      homePreviewScreen.classList.add("hidden");
+      homeGenerateScreen.classList.remove("hidden");
+    }
+
+    function renderDataTable(targetId, config) {
+      const table = document.getElementById(targetId);
+      table.className = "data-table " + (config.tableClass || "");
+      const thead = document.createElement("thead");
+      const headRow = document.createElement("tr");
+      config.headers.forEach((header, index) => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        if (config.columnClasses && config.columnClasses[index]) {
+          th.className = config.columnClasses[index];
+        }
+        headRow.appendChild(th);
+      });
+      thead.appendChild(headRow);
+
+      const tbody = document.createElement("tbody");
+      config.rows.forEach((row) => {
+        const tr = document.createElement("tr");
+        row.forEach((value, index) => {
+          const td = document.createElement("td");
+          td.textContent = value || "";
+          if (config.columnClasses && config.columnClasses[index]) {
+            td.className = config.columnClasses[index];
+          }
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      table.innerHTML = "";
+      table.appendChild(thead);
+      table.appendChild(tbody);
+    }
+
+    function setRootTab(tabName) {
+      activeRootTab = tabName;
+      rootTabButtons.forEach((button) => {
+        button.classList.toggle("active", button.getAttribute("data-root-tab-btn") === tabName);
+      });
+      rootTabPanels.forEach((panel) => {
+        panel.classList.toggle("active", panel.getAttribute("data-root-tab-panel") === tabName);
+      });
+
+      if (tabName !== "inspiration") {
+        feedVideo.pause();
+        landingVideo.pause();
+        hideShareSheet();
+        hideDownloadModal();
+        hideHomePreviewShareSheet();
+        homePreviewVideo.pause();
+        homePreviewProgressBar.style.width = "0%";
+        if (tabName === "review") {
+          resetReviewFlow();
+        }
+      } else if (currentScreen === "feed" && feedVideo.src && !feedVideoFallback.classList.contains("visible")) {
+        playCurrentVideo();
+      }
+    }
+
+    function renderHomeWaterfall() {
+      const items = homeRedesignItems[activeHomeModule];
+      homeModuleTabs.forEach((button) => {
+        button.classList.toggle("active", button.getAttribute("data-home-module-tab") === activeHomeModule);
+      });
+
+      homeWaterfallGrid.innerHTML = "";
+      const leftColumn = document.createElement("div");
+      leftColumn.className = "home-waterfall-column";
+      const rightColumn = document.createElement("div");
+      rightColumn.className = "home-waterfall-column";
+      items.forEach((item, index) => {
+        const button = document.createElement("button");
+        button.className = "home-template-card " + (item.cardClass || "");
+        button.type = "button";
+        button.setAttribute("data-home-item-index", String(index));
+        button.innerHTML = `
+          <div class="home-template-art" style="background:${item.background}"></div>
+          <video class="home-template-video" muted playsinline preload="auto" src="${encodeURI(item.video)}"></video>
+          <div class="home-template-play">▶</div>
+          <div class="home-template-title">${item.title}</div>
+          <div class="home-template-meta">${item.meta}</div>
+        `;
+        const cardVideo = button.querySelector(".home-template-video");
+        const revealCoverFrame = () => {
+          cardVideo.classList.add("ready");
+          try {
+            cardVideo.pause();
+          } catch (error) {}
+        };
+        cardVideo.addEventListener("loadeddata", () => {
+          try {
+            cardVideo.currentTime = 0.05;
+          } catch (error) {
+            revealCoverFrame();
+          }
+        });
+        cardVideo.addEventListener("seeked", revealCoverFrame, { once: true });
+        cardVideo.addEventListener("error", () => {
+          cardVideo.classList.remove("ready");
+        });
+        button.addEventListener("click", () => openHomePreview(item));
+        if (index % 2 === 0) {
+          leftColumn.appendChild(button);
+        } else {
+          rightColumn.appendChild(button);
+        }
+      });
+      homeWaterfallGrid.appendChild(leftColumn);
+      homeWaterfallGrid.appendChild(rightColumn);
+    }
+
+    function openHomeModule(moduleName) {
+      activeHomeModule = moduleName;
+      renderHomeWaterfall();
+      closeHomePreview();
+    }
+
+    function openHomePreview(item) {
+      selectedHomePreviewItem = item;
+      homePreviewHero.style.background = item.background;
+      homePreviewModuleLabel.textContent = item.moduleName;
+      homePreviewTitle.textContent = item.title;
+      homePreviewSubtitle.textContent = item.moduleName === "Trending"
+        ? "Trending pick · high engagement and conversion"
+        : "Clips pick · newly launched template";
+      homePreviewLikeCount.textContent = formatCount(item.likes);
+      homePreviewShareCount.textContent = formatCount(item.shares);
+      homePreviewFallbackTitle.textContent = item.title;
+      homePreviewVideoFallback.classList.remove("visible");
+      homePreviewVideo.pause();
+      homePreviewVideo.src = encodeURI(item.video);
+      homePreviewVideo.load();
+      homePreviewPlayBtn.classList.remove("hidden");
+      homePreviewProgressBar.style.width = "0%";
+      homePreviewLikeBtn.classList.remove("active");
+      homeHubScreen.classList.add("hidden");
+      homePreviewScreen.classList.remove("hidden");
+      hideHomePreviewShareSheet();
+    }
+
+    function closeHomePreview() {
+      homePreviewVideo.pause();
+      homePreviewPlayBtn.classList.remove("hidden");
+      homePreviewProgressBar.style.width = "0%";
+      homePreviewScreen.classList.add("hidden");
+      homeGenerateScreen.classList.add("hidden");
+      homeHubScreen.classList.remove("hidden");
+      hideHomePreviewShareSheet();
+    }
+
+    function showHomePreviewShareSheet() {
+      homePreviewShareBackdrop.classList.add("visible");
+      homePreviewShareSheet.classList.add("visible");
+    }
+
+    function hideHomePreviewShareSheet() {
+      homePreviewShareBackdrop.classList.remove("visible");
+      homePreviewShareSheet.classList.remove("visible");
+    }
+
+    function showReviewToast(message, duration = 3000) {
+      reviewToast.textContent = message;
+      reviewToast.classList.add("visible");
+      clearTimeout(showReviewToast.timer);
+      showReviewToast.timer = setTimeout(() => {
+        reviewToast.classList.remove("visible");
+      }, duration);
+    }
+
+    function updateReviewStars(score) {
+      selectedReviewScore = score;
+      reviewStars.forEach((star) => {
+        star.classList.toggle("active", Number(star.getAttribute("data-score")) <= score);
+      });
+    }
+
+    function openFeedbackModal() {
+      ratingModal.classList.add("hidden");
+      feedbackModal.classList.remove("hidden");
+      updateFeedbackSubmitState();
+    }
+
+    function closeReviewModals() {
+      ratingModal.classList.add("hidden");
+      feedbackModal.classList.add("hidden");
+    }
+
+    function resetReviewFlow() {
+      updateReviewStars(0);
+      ratingModal.classList.remove("hidden");
+      feedbackModal.classList.add("hidden");
+      reviewToast.classList.remove("visible");
+      reviewOptions.forEach((option) => option.classList.remove("active"));
+      reviewOtherInput.value = "";
+      updateFeedbackSubmitState();
+    }
+
+    function updateFeedbackSubmitState() {
+      const hasSelectedReason = Array.from(reviewOptions).some((option) => option.classList.contains("active"));
+      const hasOtherText = reviewOtherInput.value.trim().length > 0;
+      submitFeedbackBtn.disabled = !hasSelectedReason && !hasOtherText;
+    }
+
+    function showScreen(name) {
+      currentScreen = name;
+      feedScreen.classList.toggle("hidden", name !== "feed");
+      generateScreen.classList.toggle("hidden", name !== "generate");
+      loginScreen.classList.toggle("hidden", name !== "login");
+      landingScreen.classList.toggle("hidden", name !== "landing");
+      phoneScreen.classList.toggle("landing-mode", name === "landing");
+      if (name === "feed") {
+        if (feedVideo.src) {
+          playCurrentVideo();
+        }
+      } else {
+        feedVideo.pause();
+      }
+      if (name === "landing") {
+        landingVideo.pause();
+        landingPlayBtn.classList.remove("hidden");
+      } else {
+        landingVideo.pause();
+        landingPlayBtn.classList.remove("hidden");
+      }
+      if (name !== "feed") {
+        hideShareSheet();
+        hideDownloadModal();
+      }
+    }
+
+    function renderLanding() {
+      const item = templates[currentIndex];
+      landingTitle.textContent = item.title;
+      landingMeta.textContent = "NoviAI_Video";
+      landingFallbackTitle.textContent = item.title;
+      landingVideoFallback.classList.remove("visible");
+      landingVideo.src = encodeURI(item.video);
+      landingVideo.load();
+      landingPlayBtn.classList.remove("hidden");
+    }
+
+    function toggleLandingPlayback() {
+      if (currentScreen !== "landing") return;
+      if (landingVideo.paused) {
+        const playPromise = landingVideo.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => {});
+        }
+      } else {
+        landingVideo.pause();
+      }
+    }
+
+    function updatePlaybackUI() {
+      playIndicator.classList.toggle("visible", !isPlaying);
+    }
+
+    function updateProgressUI() {
+      const duration = feedVideo.duration || 0;
+      const currentTime = feedVideo.currentTime || 0;
+      const progress = duration > 0 ? Math.min((currentTime / duration) * 100, 100) : 0;
+      videoProgressBar.style.width = progress + "%";
+    }
+
+    function playCurrentVideo() {
+      isPlaying = true;
+      updatePlaybackUI();
+      const playPromise = feedVideo.play();
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => {
+          isPlaying = false;
+          updatePlaybackUI();
+        });
+      }
+    }
+
+    function pauseCurrentVideo() {
+      feedVideo.pause();
+      isPlaying = false;
+      updatePlaybackUI();
+    }
+
+    function togglePlayback() {
+      if (currentScreen !== "feed") return;
+      if (isPlaying) pauseCurrentVideo();
+      else playCurrentVideo();
+    }
+
+    function renderFeed() {
+      const item = templates[currentIndex];
+      feedBackground.style.background = item.background;
+      feedFallbackTitle.textContent = item.title;
+      feedVideoFallback.classList.remove("visible");
+      feedVideo.src = encodeURI(item.video);
+      feedVideo.load();
+      videoProgressBar.style.width = "0%";
+      templateTitle.textContent = item.title;
+      likeCount.textContent = formatCount(item.likes);
+      shareCount.textContent = formatCount(item.shares);
+      likeBtn.classList.remove("active");
+      isPlaying = true;
+      updatePlaybackUI();
+      renderLanding();
+    }
+
+    function nextTemplate(step) {
+      currentIndex = (currentIndex + step + templates.length) % templates.length;
+      renderFeed();
+      showScreen("feed");
+    }
+
+    function openGenerate(template) {
+      if (generateReturnTarget !== "home-preview") {
+        generateReturnTarget = "feed";
+      }
+      showScreen("generate");
+      const isImage = template.type === "image";
+      imageTab.classList.toggle("active", isImage);
+      textTab.classList.toggle("active", !isImage);
+      referenceField.classList.toggle("hidden", !isImage);
+      modelName.textContent = template.model;
+      templatePreset.textContent = template.templateName;
+      referenceTemplate.textContent = template.templateName;
+      resolutionOpt.textContent = template.resolution;
+      durationOpt.textContent = template.duration;
+      ratioOpt.textContent = template.ratio;
+      promptBody.textContent = template.prompt;
+      promptCounter.textContent = template.prompt.length + " / 5000";
+      generateNote.textContent = isImage
+        ? "Reference image and generation parameters are prefilled from Inspiration."
+        : "Prompt and generation parameters are prefilled from Inspiration.";
+    }
+
+    function openLogin() {
+      showScreen("login");
+    }
+
+    function getShareCopyText(template) {
+      return "Check out this amazing AI video: https://novi.ai/inspiration/" + template.id + " Tap the link or copy this message to open it in Novi AI and view the full content.";
+    }
+
+    function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+      }
+
+      return new Promise((resolve, reject) => {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        textarea.style.pointerEvents = "none";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+
+        try {
+          const success = document.execCommand("copy");
+          document.body.removeChild(textarea);
+          if (success) resolve();
+          else reject(new Error("Copy command failed"));
+        } catch (error) {
+          document.body.removeChild(textarea);
+          reject(error);
+        }
+      });
+    }
+
+    function showToast(message, duration = 3000) {
+      toast.textContent = message;
+      toast.classList.add("visible");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => {
+        toast.classList.remove("visible");
+      }, duration);
+    }
+
+    function showShareSheet() {
+      shareVisible = true;
+      shareBackdrop.classList.add("visible");
+      shareSheet.classList.add("visible");
+    }
+
+    function hideShareSheet(keepBackdrop = false) {
+      shareVisible = false;
+      shareSheet.classList.remove("visible");
+      if (!keepBackdrop && !downloadVisible) {
+        shareBackdrop.classList.remove("visible");
+      }
+    }
+
+    function closeShareSheetFully() {
+      shareVisible = false;
+      shareSheet.classList.remove("visible");
+      shareBackdrop.classList.remove("visible");
+    }
+
+    function showDownloadModal() {
+      downloadVisible = true;
+      shareBackdrop.classList.add("visible");
+      downloadModal.classList.add("visible");
+    }
+
+    function hideDownloadModal() {
+      downloadVisible = false;
+      downloadModal.classList.remove("visible");
+      if (!shareVisible) {
+        shareBackdrop.classList.remove("visible");
+      }
+      resetDownloadProgress();
+    }
+
+    function resetDownloadProgress() {
+      clearInterval(downloadTimer);
+      downloadTimer = null;
+      downloadAction.disabled = false;
+      downloadPercent.textContent = "0%";
+      downloadProgressBar.style.width = "0%";
+    }
+
+    function startDownloadProgress() {
+      clearInterval(downloadTimer);
+      let progress = 0;
+      downloadAction.disabled = true;
+      downloadPercent.textContent = "0%";
+      downloadProgressBar.style.width = "0%";
+      hideShareSheet(true);
+      showDownloadModal();
+
+      downloadTimer = setInterval(() => {
+        progress += progress < 70 ? 11 : progress < 90 ? 6 : 3;
+        if (progress >= 100) {
+          progress = 100;
+          downloadPercent.textContent = "100%";
+          downloadProgressBar.style.width = "100%";
+          clearInterval(downloadTimer);
+          downloadTimer = null;
+          setTimeout(() => {
+            hideDownloadModal();
+            showToast("Saved to Album", 3000);
+          }, 260);
+          return;
+        }
+        downloadPercent.textContent = progress + "%";
+        downloadProgressBar.style.width = progress + "%";
+      }, 220);
+    }
+
+    function openShareFromAction(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      showShareSheet();
+    }
+
+    document.getElementById("prevBtn").addEventListener("click", () => nextTemplate(-1));
+    document.getElementById("nextBtn").addEventListener("click", () => nextTemplate(1));
+    document.getElementById("backFromGenerate").addEventListener("click", () => {
+      if (generateReturnTarget === "home-preview") {
+        generateReturnTarget = "feed";
+        setRootTab("home-redesign");
+        openHomePreview(selectedHomePreviewItem);
+        return;
+      }
+      showScreen("feed");
+    });
+    document.getElementById("backFromLogin").addEventListener("click", () => showScreen("feed"));
+    backFromLanding.addEventListener("click", () => showScreen("feed"));
+    function openLandingPreview() {
+      renderLanding();
+      showScreen("landing");
+    }
+
+    openLandingFromDoc.addEventListener("click", openLandingPreview);
+    openLandingSideBtn.addEventListener("click", openLandingPreview);
+    landingPlayBtn.addEventListener("click", toggleLandingPlayback);
+    landingVideo.addEventListener("click", toggleLandingPlayback);
+    landingVideo.addEventListener("play", () => landingPlayBtn.classList.add("hidden"));
+    landingVideo.addEventListener("pause", () => landingPlayBtn.classList.remove("hidden"));
+    landingVideo.addEventListener("loadeddata", () => landingVideoFallback.classList.remove("visible"));
+    landingVideo.addEventListener("error", () => {
+      landingVideo.pause();
+      landingPlayBtn.classList.add("hidden");
+      landingVideoFallback.classList.add("visible");
+    });
+    landingCreateBtn.addEventListener("click", () => showScreen("feed"));
+
+    feedVideo.addEventListener("loadeddata", () => {
+      feedVideoFallback.classList.remove("visible");
+      updateProgressUI();
+      if (currentScreen === "feed") {
+        playCurrentVideo();
+      }
+    });
+
+    feedVideo.addEventListener("error", () => {
+      feedVideo.pause();
+      isPlaying = false;
+      updatePlaybackUI();
+      feedVideoFallback.classList.add("visible");
+    });
+
+    feedVideo.addEventListener("timeupdate", updateProgressUI);
+
+    feedVideo.addEventListener("ended", () => {
+      videoProgressBar.style.width = "100%";
+    });
+
+    feedVideo.addEventListener("pause", () => {
+      if (currentScreen === "feed") {
+        isPlaying = false;
+        updatePlaybackUI();
+      }
+    });
+
+    feedVideo.addEventListener("play", () => {
+      if (currentScreen === "feed") {
+        isPlaying = true;
+        updatePlaybackUI();
+      }
+    });
+
+    feedBackground.addEventListener("click", (event) => {
+      if (event.target.closest(".feed-side, .feed-bottom, .bottom-nav, .sheet, .sheet-backdrop")) {
+        return;
+      }
+      togglePlayback();
+    });
+
+    likeBtn.addEventListener("click", () => {
+      if (guestMode) {
+        openLogin();
+        return;
+      }
+      likeBtn.classList.toggle("active");
+    });
+
+    shareBtn.addEventListener("click", openShareFromAction);
+    shareBtn.addEventListener("pointerup", openShareFromAction);
+
+    closeShare.addEventListener("click", closeShareSheetFully);
+    shareBackdrop.addEventListener("click", () => {
+      if (shareVisible && !downloadVisible) {
+        closeShareSheetFully();
+      }
+    });
+
+    document.querySelectorAll("[data-share-action]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const action = button.getAttribute("data-share-action");
+        if (action === "copy") {
+          try {
+            await copyText(getShareCopyText(templates[currentIndex]));
+            closeShareSheetFully();
+            showToast("Link copied successfully. Share it with your friends now!", 3000);
+          } catch (error) {
+            showToast("Copy failed. Please try again.", 3000);
+          }
+        }
+        if (action === "download") {
+          startDownloadProgress();
+        }
+      });
+    });
+
+    createSameBtn.addEventListener("click", () => {
+      openGenerate(templates[currentIndex]);
+    });
+
+    document.getElementById("generateBtn").addEventListener("click", () => {
+      showToast("Generate action started");
+    });
+
+    homeModuleTabs.forEach((button) => {
+      button.addEventListener("click", () => openHomeModule(button.getAttribute("data-home-module-tab")));
+    });
+    homePreviewBackBtn.addEventListener("click", closeHomePreview);
+    homePreviewLikeBtn.addEventListener("click", () => {
+      homePreviewLikeBtn.classList.toggle("active");
+    });
+    homePreviewShareBtn.addEventListener("click", showHomePreviewShareSheet);
+    homePreviewCloseShareBtn.addEventListener("click", hideHomePreviewShareSheet);
+    homePreviewShareBackdrop.addEventListener("click", hideHomePreviewShareSheet);
+    homePreviewCopyBtn.addEventListener("click", async () => {
+      const template = templates[selectedHomePreviewItem.templateIndex];
+      try {
+        await copyText(getShareCopyText(template));
+        hideHomePreviewShareSheet();
+        showHomePreviewToast("Link copied successfully. Share it with your friends now!", 3000);
+      } catch (error) {
+        showHomePreviewToast("Copy failed. Please try again.", 3000);
+      }
+    });
+    homePreviewDownloadBtn.addEventListener("click", () => {
+      hideHomePreviewShareSheet();
+      showHomePreviewToast("Saved to Album", 3000);
+    });
+    homePreviewCreateBtn.addEventListener("click", () => {
+      openGenerateFromHomeItem(selectedHomePreviewItem);
+    });
+    homeBackFromGenerate.addEventListener("click", () => {
+      homeGenerateScreen.classList.add("hidden");
+      homePreviewScreen.classList.remove("hidden");
+    });
+    homeGenerateBtn.addEventListener("click", () => {
+      showHomePreviewToast("Generate action started", 3000);
+    });
+    homeRedesignNavHome.addEventListener("click", () => {
+      closeHomePreview();
+      setRootTab("home-redesign");
+    });
+    homePreviewNavHome.addEventListener("click", () => {
+      closeHomePreview();
+      setRootTab("home-redesign");
+    });
+    homeRedesignNavInspiration.addEventListener("click", () => {
+      closeHomePreview();
+      setRootTab("inspiration");
+      showScreen("feed");
+    });
+    homePreviewNavInspiration.addEventListener("click", () => {
+      closeHomePreview();
+      setRootTab("inspiration");
+      showScreen("feed");
+    });
+    inspirationNavHome.addEventListener("click", () => {
+      setRootTab("home-redesign");
+      closeHomePreview();
+    });
+
+    homePreviewPlayBtn.addEventListener("click", () => {
+      if (homePreviewVideo.paused) {
+        const promise = homePreviewVideo.play();
+        if (promise && typeof promise.catch === "function") {
+          promise.catch(() => {});
+        }
+      } else {
+        homePreviewVideo.pause();
+      }
+    });
+    homePreviewVideo.addEventListener("click", () => {
+      if (homePreviewVideo.paused) {
+        const promise = homePreviewVideo.play();
+        if (promise && typeof promise.catch === "function") {
+          promise.catch(() => {});
+        }
+      } else {
+        homePreviewVideo.pause();
+      }
+    });
+    homePreviewVideo.addEventListener("play", () => homePreviewPlayBtn.classList.add("hidden"));
+    homePreviewVideo.addEventListener("pause", () => homePreviewPlayBtn.classList.remove("hidden"));
+    homePreviewVideo.addEventListener("loadeddata", () => homePreviewVideoFallback.classList.remove("visible"));
+    homePreviewVideo.addEventListener("loadeddata", () => {
+      const promise = homePreviewVideo.play();
+      if (promise && typeof promise.catch === "function") {
+        promise.catch(() => {});
+      }
+    });
+    homePreviewVideo.addEventListener("timeupdate", () => {
+      const duration = homePreviewVideo.duration || 0;
+      const currentTime = homePreviewVideo.currentTime || 0;
+      const progress = duration > 0 ? Math.min((currentTime / duration) * 100, 100) : 0;
+      homePreviewProgressBar.style.width = progress + "%";
+    });
+    homePreviewVideo.addEventListener("error", () => {
+      homePreviewVideo.pause();
+      homePreviewPlayBtn.classList.add("hidden");
+      homePreviewVideoFallback.classList.add("visible");
+    });
+
+    ["signInApple", "signInGoogle", "createAccount"].forEach((id) => {
+      document.getElementById(id).addEventListener("click", () => {
+        guestMode = false;
+        showScreen("feed");
+      });
+    });
+
+    textTab.addEventListener("click", () => openGenerate({ ...templates[currentIndex], type: "text" }));
+    imageTab.addEventListener("click", () => openGenerate({ ...templates[currentIndex], type: "image" }));
+    rootTabButtons.forEach((button) => {
+      button.addEventListener("click", () => setRootTab(button.getAttribute("data-root-tab-btn")));
+    });
+    reviewStars.forEach((star) => {
+      star.addEventListener("click", () => {
+        const score = Number(star.getAttribute("data-score"));
+        updateReviewStars(score);
+        if (score >= 4) {
+          closeReviewModals();
+          showReviewToast("Redirecting you to the store rating page...", 3000);
+        } else {
+          openFeedbackModal();
+        }
+      });
+    });
+    closeRatingModal.addEventListener("click", closeReviewModals);
+    closeFeedbackModal.addEventListener("click", closeReviewModals);
+    reviewOptions.forEach((option) => {
+      option.addEventListener("click", () => {
+        option.classList.toggle("active");
+        updateFeedbackSubmitState();
+      });
+    });
+    reviewOtherInput.addEventListener("input", updateFeedbackSubmitState);
+    submitFeedbackBtn.addEventListener("click", () => {
+      feedbackModal.classList.add("hidden");
+      showReviewToast("Thanks for your feedback. We'll keep improving Novi AI for you.", 3000);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (activeRootTab === "inspiration" && currentScreen === "feed" && !shareVisible) {
+        if (event.key === "ArrowDown") nextTemplate(1);
+        if (event.key === "ArrowUp") nextTemplate(-1);
+        if (event.key === " " || event.key === "k") {
+          event.preventDefault();
+          togglePlayback();
+        }
+      }
+      if (event.key === "Escape") {
+        hideShareSheet();
+        hideDownloadModal();
+        showScreen("feed");
+      }
+    });
+
+    feedScreen.addEventListener("wheel", (event) => {
+      if (activeRootTab !== "inspiration" || currentScreen !== "feed") return;
+      if (Math.abs(event.deltaY) < 18) return;
+      nextTemplate(event.deltaY > 0 ? 1 : -1);
+    }, { passive: true });
+
+    renderDataTable("requirementsTable", requirementsTableConfig);
+    renderDataTable("trackingTable", trackingTableConfig);
+    renderHomeWaterfall();
+    renderFeed();
+    showScreen("feed");
+    resetReviewFlow();
+    setRootTab("requirements");
+  </script>
+</body>
+</html>
